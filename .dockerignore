@@ -1,5 +1,5 @@
 #Archivos sensibles
-.env
+#.env
 *.key
 *.pen
 
