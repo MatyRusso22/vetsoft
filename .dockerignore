@@ -1,0 +1,27 @@
+#Archivos sensibles
+.env
+*.key
+*.pen
+
+#Archivos de control de versionado
+.git
+.hg
+
+#Archivos temporales/compilacion
+__pycache__
+*.pyc
+*.pyo
+*.log
+
+#Backups y archibos temporales de editores
+*.bak
+*.swp
+
+#Documentacion
+README.md
+docs/
+
+#Archivos locales
+.vscode/
+.idea/
+tests/
