@@ -30,3 +30,7 @@ Sivori, Diego
 
 `python manage.py runserver`
 
+## Version actual de la imagen de docker
+
+1.0
+
