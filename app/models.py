@@ -83,8 +83,13 @@ def validate_product(data):
         errors['type'] = 'Por favor ingrese el tipo del producto'
     if price == "":
         errors['price'] = 'Por favor ingrese el precio del producto'
-    elif float(price) <= 0:
-        errors['price'] = 'Por favor ingrese el precio del producto debe ser mayor que cero'
+    else:
+        try:
+            price_float = float(price)
+            if price_float <= 0:
+                errors['price'] = 'Por favor ingrese un precio del producto mayor que cero'
+        except ValueError:
+            errors['price'] = 'Por favor ingrese un precio válido para el producto'
 
     return errors
 
@@ -278,7 +283,8 @@ class Vet(models.Model):
         Vet.objects.create(
             name=vet_data.get("name"),
             email=vet_data.get("email"),
-            phone=vet_data.get("phone"),           
+            phone=vet_data.get("phone"),
+                      
         )
 
         return True, None
