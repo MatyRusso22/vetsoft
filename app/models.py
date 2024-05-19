@@ -26,6 +26,7 @@ def validate_pet(data):
 
     name = data.get("name", "")
     breed = data.get("breed", "")
+    weigth = data.get("weight", "")
     birthday = data.get("birthday", "")
 
     if name == "":
@@ -33,6 +34,13 @@ def validate_pet(data):
 
     if birthday == "":
         errors["birthday"] = "Por favor ingrese la fecha de nacimiento de la mascota"
+
+    if weight == "":
+        errors["weight"] = "Por favor ingrese el peso de la mascota"
+    elif not weight.isdigit():  # Asegurarse de que el peso sea un número válido
+        errors["weight"] = "El peso debe ser un número válido"
+    elif float(weight) < 0:  # Validar que el peso no sea menor a 0
+        errors["weight"] = "El peso no puede ser menor a 0"
 
     return errors
 
@@ -154,6 +162,7 @@ class Pet(models.Model):
     name = models.CharField(max_length=100)
     breed = models.CharField(max_length=100, blank=True)
     birthday = models.DateField()
+    weigth = models.FloatField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -169,6 +178,7 @@ class Pet(models.Model):
             name=pet_data.get("name"),
             breed=pet_data.get("breed"),
             birthday=pet_data.get("birthday"),
+            weigth=pet_data.get("weight"),
         )
 
         return True, None
@@ -177,6 +187,7 @@ class Pet(models.Model):
         self.name = pet_data.get("name", "") or self.name
         self.breed = pet_data.get("breed", "") or self.breed
         self.birthday = pet_data.get("birthday", "") or self.birthday
+        self.weigth = pet_data.get("weight", "") or self.weigth
 
         self.save()
 
