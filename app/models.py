@@ -194,6 +194,10 @@ class Pet(models.Model):
         self.birthday = pet_data.get("birthday", "") or self.birthday
         self.weight = pet_data.get("weight", "") or self.weight
 
+        weight = float(pet_data.get("weight", 0)) 
+        if weight < 0:
+            raise ValueError("El peso no puede ser menor que 0")
+
         self.save()
 
 class Medicine(models.Model):
