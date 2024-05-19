@@ -173,6 +173,11 @@ class Pet(models.Model):
 
         if len(errors.keys()) > 0:
             return False, errors
+        
+        weight = float(pet_data.get("weight"))
+        if weight < 0:
+            errors["weight"] = "El peso no puede ser menor que 0"
+            return False, errors
 
         Pet.objects.create(
             name=pet_data.get("name"),
