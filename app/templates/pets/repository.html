@@ -16,6 +16,7 @@
             <tr>
                 <th>Nombre</th>
                 <th>Raza</th>
+                <th>Peso</th>
                 <th>Fecha de Nacimiento</th>
                 <th>Acciones</th>
             </tr>
@@ -27,6 +28,7 @@
                 <td>{{ pet.name }}</td>
                 <td>{{ pet.breed }}</td>
                 <td>{{ pet.birthday }}</td>
+                <td>{{ pet.weight }}</td>
                 <td>
                     <a class="btn btn-outline-primary"
                         href="{% url 'pets_edit' id=pet.id %}"
