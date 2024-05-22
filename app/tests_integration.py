@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.shortcuts import reverse
 from app.models import Client
+from app.models import Provider
 
 
 class HomePageTest(TestCase):
@@ -93,3 +94,78 @@ class ClientsTest(TestCase):
         self.assertEqual(editedClient.phone, client.phone)
         self.assertEqual(editedClient.address, client.address)
         self.assertEqual(editedClient.email, client.email)
+
+
+
+class ProvidersTest(TestCase):
+
+    def test_form_use_provider_form_template(self):
+        response = self.client.get(reverse("provider_form"))
+        self.assertTemplateUsed(response, "provider/form.html")
+
+    def test_can_create_provider(self):
+        response = self.client.post(
+            reverse("provider_form"),
+            data={
+                "name": "Luis Fernando Flores",
+                "email": "Fernanf100@gmail.com",
+                "address": "ElSalvador 245",
+            },
+        )
+        providers = Provider.objects.all()
+        self.assertEqual(len(providers), 1)
+
+        self.assertEqual(providers[0].name, "Luis Fernando Flores")
+        self.assertEqual(providers[0].email, "Fernanf100@gmail.com")
+        self.assertEqual(providers[0].address, "ElSalvador 245")
+
+        self.assertRedirects(response, reverse("provider_repo"))
+
+    def test_validation_errors_create_provider(self):
+        response = self.client.post(
+            reverse("provider_form"),
+            data={},
+        )
+
+        self.assertContains(response, "Por favor ingrese un nombre")
+        self.assertContains(response, "Por favor ingrese un email")
+        self.assertContains(response, "Por favor ingrese una dirección")
+
+    def test_should_response_with_404_status_if_provider_doesnt_exists(self):
+        response = self.client.get(reverse("provider_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_validation_invalid_email(self):
+        response = self.client.post(
+            reverse("provider_form"),
+            data={
+                "name": "Luis Fernando Flores",
+                "email": "Fernanf100",
+                "address": "ElSalvador 245",
+            },
+        )
+
+        self.assertContains(response, "Por favor ingrese un email valido")
+
+    def test_edit_provider_with_valid_data(self):
+        provider = Provider.objects.create(
+            name="Luis Fernando Flores",
+            address="ElSalvador 245",
+            email="Fernanf100@gmail.com",
+        )
+
+        response = self.client.post(
+            reverse("provider_form"),
+            data={
+                "id": provider.id,
+                "name": "Carlos Tevez",
+                "address": "San Martin 212",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        editedProvider = Provider.objects.get(pk=provider.id)
+        self.assertEqual(editedProvider.name, "Carlos Tevez")
+        self.assertEqual(editedProvider.address, "San Martin 212")
+        self.assertEqual(editedProvider.email, provider.email)
