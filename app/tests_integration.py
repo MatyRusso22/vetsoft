@@ -93,3 +93,12 @@ class ClientsTest(TestCase):
         self.assertEqual(editedClient.phone, client.phone)
         self.assertEqual(editedClient.address, client.address)
         self.assertEqual(editedClient.email, client.email)
+
+
+
+class ProvidersTest(TestCase):
+    def test_form_use_provider_form_template(self):
+        response = self.client.get(reverse("provider_form"))
+        self.assertTemplateUsed(response, "provider/form.html")
+
+    
