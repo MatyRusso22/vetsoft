@@ -46,14 +46,14 @@
                         value="{{ form.instance.breed }}"/>
                 </div>
                 <label for="weight" class="form-label">Peso</label>
-                    <input type="float"
+                    <input type="number"
                         id="weight"
                         name="weight"
                         value="{{ form.instance.weight }}"
                         class="form-control"
                         required/>
 
-                    {% if form.errors.name %}
+                    {% if form.errors.weight %}
                         <div class="invalid-feedback">
                             {{ form.errors.weight }}
                         </div>
