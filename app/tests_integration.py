@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.shortcuts import reverse
 from app.models import Client
+from app.models import Provider
 
 
 class HomePageTest(TestCase):
@@ -97,8 +98,36 @@ class ClientsTest(TestCase):
 
 
 class ProvidersTest(TestCase):
+
     def test_form_use_provider_form_template(self):
         response = self.client.get(reverse("provider_form"))
         self.assertTemplateUsed(response, "provider/form.html")
 
+    def test_can_create_provider(self):
+        response = self.client.post(
+            reverse("provider_form"),
+            data={
+                "name": "Luis Fernando Flores",
+                "email": "Fernanf100@gmail.com",
+                "address": "ElSalvador 245",
+            },
+        )
+        providers = Provider.objects.all()
+        self.assertEqual(len(providers), 1)
+
+        self.assertEqual(providers[0].name, "Luis Fernando Flores")
+        self.assertEqual(providers[0].email, "Fernanf100@gmail.com")
+        self.assertEqual(providers[0].address, "ElSalvador 245")
+
+        self.assertRedirects(response, reverse("provider_repo"))
+
+    def test_validation_errors_create_provider(self):
+        response = self.client.post(
+            reverse("provider_form"),
+            data={},
+        )
+
+        self.assertContains(response, "Por favor ingrese un nombre")
+        self.assertContains(response, "Por favor ingrese un email")
+        self.assertContains(response, "Por favor ingrese una dirección")
     
