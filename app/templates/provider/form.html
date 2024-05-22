@@ -50,6 +50,21 @@
                         </div>
                     {% endif %}
                 </div>
+                <div>
+                    <label for="address" class="form-label">Dirección</label>
+                    <input type="text"
+                        id="address"
+                        name="address"
+                        class="form-control"
+                        value="{{ provider.address }}"
+                        required/>
+
+                    {% if errors.email %}
+                        <div class="invalid-feedback">
+                            {{ errors.email }}
+                        </div>
+                    {% endif %}
+                </div>
 
                 <button class="btn btn-primary">Guardar</button>
             </form>
