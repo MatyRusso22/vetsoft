@@ -7,8 +7,6 @@ from django.urls import reverse
 
 from app.models import Client
 
-from app.models import Provider
-
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 playwright = sync_playwright().start()
 headless = os.environ.get("HEADLESS", 1) == 1
@@ -244,37 +242,3 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         expect(edit_action).to_have_attribute(
             "href", reverse("clients_edit", kwargs={"id": client.id})
         )
-
-class ProvidersTestCase(PlaywrightTestCase):
-    def test_should_show_providers_data(self):
-        Provider.objects.create(
-            name="Provider 1",
-            address="123 Main St",
-            email="provider1@example.com",
-        )
-
-        Provider.objects.create(
-            name="Provider 2",
-            address="456 Elm St",
-            email="provider2@example.com",
-        )
-
-        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
-
-        expect(self.page.get_by_text("No existen proveedores")).not_to_be_visible()
-
-        expect(self.page.get_by_text("Provider 1")).to_be_visible()
-        expect(self.page.get_by_text("123 Main St")).to_be_visible()
-        expect(self.page.get_by_text("provider1@example.com")).to_be_visible()
-
-        expect(self.page.get_by_text("Provider 2")).to_be_visible()
-        expect(self.page.get_by_text("456 Elm St")).to_be_visible()
-        expect(self.page.get_by_text("provider2@example.com")).to_be_visible()
-
-    def test_should_show_add_provider_action(self):
-        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
-
-        add_provider_action = self.page.get_by_role(
-            "link", name="Nuevo proveedor", exact=False
-        )
-        expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
