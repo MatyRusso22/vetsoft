@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 
 def validate_client(data):
@@ -34,13 +35,21 @@ def validate_pet(data):
 
     if birthday == "":
         errors["birthday"] = "Por favor ingrese la fecha de nacimiento de la mascota"
+    else:
+        try:
+            datetime.strptime(birthday, "%d-%m-%Y")
+        except ValueError:
+            errors["birthday"] = "La fecha de nacimiento debe tener el formato DD-MM-YYYY"
 
     if weight == "":
         errors["weight"] = "Por favor ingrese el peso de la mascota"
-    elif not weight.isdigit():  # Asegurarse de que el peso sea un número válido
-        errors["weight"] = "El peso debe ser un número válido"
-    elif float(weight) < 0:  # Validar que el peso no sea menor a 0
-        errors["weight"] = "El peso no puede ser menor a 0"
+    else:
+        try:
+            weight = float(weight)
+            if weight < 0:
+                errors["weight"] = "El peso no puede ser menor a 0"
+        except ValueError:
+            errors["weight"] = "El peso debe ser un número válido"
 
     return errors
 
@@ -170,34 +179,29 @@ class Pet(models.Model):
     @classmethod
     def save_pet(cls, pet_data):
         errors = validate_pet(pet_data)
-
-        if len(errors.keys()) > 0:
+        if errors:
             return False, errors
         
-        weight = float(pet_data.get("weight"))
-        if weight < 0:
-            errors["weight"] = "El peso no puede ser menor que 0"
-            return False, errors
+        birthday = datetime.strptime(pet_data["birthday"], "%d-%m-%Y").date()
 
         Pet.objects.create(
             name=pet_data.get("name"),
             breed=pet_data.get("breed"),
-            birthday=pet_data.get("birthday"),
-            weight=pet_data.get("weight"),
+            birthday=birthday,
+            weight=float(pet_data.get("weight")),
         )
-
         return True, None
 
     def update_pet(self, pet_data):
-        self.name = pet_data.get("name", "") or self.name
-        self.breed = pet_data.get("breed", "") or self.breed
-        self.birthday = pet_data.get("birthday", "") or self.birthday
-        self.weight = pet_data.get("weight", "") or self.weight
-
-        weight = float(pet_data.get("weight", 0)) 
-        if weight < 0:
-            raise ValueError("El peso no puede ser menor que 0")
-
+        if "birthday" in pet_data and pet_data["birthday"]:
+            self.birthday = datetime.strptime(pet_data["birthday"], "%d-%m-%Y").date()
+        if "weight" in pet_data:
+            weight = float(pet_data["weight"])
+            if weight < 0:
+                raise ValueError("El peso no puede ser menor que 0")
+            self.weight = weight
+        self.name = pet_data.get("name", self.name)
+        self.breed = pet_data.get("breed", self.breed)
         self.save()
 
 class Medicine(models.Model):
