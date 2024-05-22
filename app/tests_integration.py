@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.shortcuts import reverse
 from app.models import Client
+from app.models import Pet
 
 
 class HomePageTest(TestCase):
@@ -93,3 +94,64 @@ class ClientsTest(TestCase):
         self.assertEqual(editedClient.phone, client.phone)
         self.assertEqual(editedClient.address, client.address)
         self.assertEqual(editedClient.email, client.email)
+
+class PetsTest(TestCase):
+    def test_repo_use_repo_template(self):
+        response = self.client.get(reverse("pets_repo"))
+        self.assertTemplateUsed(response, "pets/repository.html")
+
+    def test_form_use_form_template(self):
+        response = self.client.get(reverse("pets_form"))
+        self.assertTemplateUsed(response, "pets/form.html")
+
+    def test_can_create_pet(self):
+        response = self.client.post(
+            reverse("pets_form"),
+            data={
+                "name": "Toto",
+                "breed": "Schnauzer",
+                "weight": 25,
+                "birthday": "01-01-2019",
+            },
+        )
+        pets = Pet.objects.all()
+        self.assertEqual(len(pets), 1)
+        self.assertEqual(pets[0].name, "Toto")
+        self.assertEqual(pets[0].breed, "Schnauzer")
+        self.assertEqual(pets[0].weight, 25)
+        self.assertEqual(pets[0].birthday.strftime("%d-%m-%Y"), "01-01-2019")
+        self.assertRedirects(response, reverse("pets_repo"))
+
+    def test_should_response_with_404_status_if_pet_doesnt_exists(self):
+        response = self.client.get(reverse("pets_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_edit_pet_with_valid_data(self):
+        pet = Pet.objects.create(
+            name="Roma",
+            breed="",
+            weight=25,
+            birthday="2019-01-01",
+        )
+
+        # Intento modificar que el peso sea negativo
+        response = self.client.post(
+            reverse("pets_form"),
+            data={
+                "id": pet.id,
+                "name": "Roma",
+                "breed": "",
+                "weight": -30,  # Peso negativo
+                "birthday": "02-02-2020",
+            },
+        )
+
+        # Deberia tirar error, con un codigo 302
+        self.assertEqual(response.status_code, 302)
+
+        # Y no se modificaria nada
+        editedPet = Pet.objects.get(pk=pet.id)
+        self.assertEqual(editedPet.name, "Roma")
+        self.assertEqual(editedPet.breed, "")
+        self.assertEqual(editedPet.weight, 25)
+        self.assertEqual(editedPet.birthday.strftime("%d-%m-%Y"), "01-01-2019")
