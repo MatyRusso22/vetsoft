@@ -146,3 +146,26 @@ class ProvidersTest(TestCase):
         )
 
         self.assertContains(response, "Por favor ingrese un email valido")
+
+    def test_edit_provider_with_valid_data(self):
+        provider = Provider.objects.create(
+            name="Luis Fernando Flores",
+            address="ElSalvador 245",
+            email="Fernanf100@gmail.com",
+        )
+
+        response = self.client.post(
+            reverse("provider_form"),
+            data={
+                "id": provider.id,
+                "name": "Carlos Tevez",
+                "address": "San Martin 212",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        editedProvider = Provider.objects.get(pk=provider.id)
+        self.assertEqual(editedProvider.name, "Carlos Tevez")
+        self.assertEqual(editedProvider.address, "San Martin 212")
+        self.assertEqual(editedProvider.email, provider.email)
