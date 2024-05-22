@@ -1,5 +1,8 @@
 from django.test import TestCase
 from app.models import Client
+from app.models import Pet
+from datetime import datetime
+
 
 
 class ClientModelTest(TestCase):
@@ -57,3 +60,64 @@ class ClientModelTest(TestCase):
         client_updated = Client.objects.get(pk=1)
 
         self.assertEqual(client_updated.phone, "221555232")
+
+class PetModelTest(TestCase):
+    def test_can_create_and_get_pet(self):
+        success, errors = Pet.save_pet(
+            {
+                "name": "Toto",
+                "breed": "Labrador",
+                "weight": 25.0,
+                "birthday": "01-05-2018",
+            }
+        )
+        self.assertTrue(success)
+        self.assertIsNone(errors)
+
+        pets = Pet.objects.all()
+        self.assertEqual(len(pets), 1)
+
+        self.assertEqual(pets[0].name, "Toto")
+        self.assertEqual(pets[0].breed, "Labrador")
+        self.assertEqual(pets[0].weight, 25.0)
+        self.assertEqual(pets[0].birthday.strftime("%d-%m-%Y"), "01-05-2018")
+
+    def test_can_update_pet(self):
+        success, errors = Pet.save_pet(
+            {
+                "name": "Roma",
+                "breed": "",
+                "weight": 25.0,
+                "birthday": "11-02-2018",
+            }
+        )
+        self.assertTrue(success)
+        self.assertIsNone(errors)
+        
+        pet = Pet.objects.get(pk=1)
+        self.assertEqual(pet.weight, 25.0)
+
+        pet.update_pet({"weight": 26.5})
+        pet_updated = Pet.objects.get(pk=1)
+        self.assertEqual(pet_updated.weight, 26.5)
+
+    def test_update_pet_with_error(self):
+        success, errors = Pet.save_pet(
+            {
+                "name": "Roma",
+                "breed": "",
+                "weight": 25.0,
+                "birthday": "11-02-2018",
+            }
+        )
+        self.assertTrue(success)
+        self.assertIsNone(errors)
+        
+        pet = Pet.objects.get(pk=1)
+        self.assertEqual(pet.weight, 25.0)
+
+        with self.assertRaises(ValueError):
+            pet.update_pet({"weight": -1})
+
+        pet_updated = Pet.objects.get(pk=1)
+        self.assertEqual(pet_updated.weight, 25.0)
