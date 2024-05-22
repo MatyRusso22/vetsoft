@@ -130,4 +130,19 @@ class ProvidersTest(TestCase):
         self.assertContains(response, "Por favor ingrese un nombre")
         self.assertContains(response, "Por favor ingrese un email")
         self.assertContains(response, "Por favor ingrese una dirección")
-    
+
+    def test_should_response_with_404_status_if_provider_doesnt_exists(self):
+        response = self.client.get(reverse("provider_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_validation_invalid_email(self):
+        response = self.client.post(
+            reverse("provider_form"),
+            data={
+                "name": "Luis Fernando Flores",
+                "email": "Fernanf100",
+                "address": "ElSalvador 245",
+            },
+        )
+
+        self.assertContains(response, "Por favor ingrese un email valido")
