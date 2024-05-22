@@ -59,6 +59,7 @@ def validate_provider(data):
 
     name = data.get("name", "")
     email = data.get("email", "")
+    address=data.get("address","")
 
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
@@ -68,6 +69,8 @@ def validate_provider(data):
     elif email.count("@") == 0:
         errors["email"] = "Por favor ingrese un email valido"
 
+    if address == "":
+        errors["address"] = "Por favor ingrese una dirección"
     return errors
 
 
@@ -213,6 +216,7 @@ class Medicine(models.Model):
 class Provider(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
+    address=models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
