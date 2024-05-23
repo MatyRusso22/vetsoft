@@ -19,7 +19,7 @@ class MedicineForm(forms.ModelForm):
 class ProviderForm(forms.ModelForm):
     class Meta:
         model = Provider
-        fields = ['name', 'email']
+        fields = ['name', 'email', 'address']
 
 class ProductForm(forms.ModelForm):
     class Meta:

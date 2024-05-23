@@ -69,7 +69,13 @@ def validate_medicine(data):
     
     if dosis == "":
         errors["dosis"] = "Por favor ingrese una dosis"
-
+    else: 
+        try:
+            dosis_entero = int(dosis)
+            if dosis_entero <= 0:
+                errors['dosis'] = "La dosis debe ser mayor a cero"
+        except ValueError:
+            errors['dosis'] = "La cantidad de dosis debe ser un numero entero"
     return errors
 
 def validate_provider(data):
@@ -77,6 +83,7 @@ def validate_provider(data):
 
     name = data.get("name", "")
     email = data.get("email", "")
+    address=data.get("address","")
 
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
@@ -86,6 +93,8 @@ def validate_provider(data):
     elif email.count("@") == 0:
         errors["email"] = "Por favor ingrese un email valido"
 
+    if address == "":
+        errors["address"] = "Por favor ingrese una dirección"
     return errors
 
 
@@ -261,6 +270,7 @@ class Medicine(models.Model):
 class Provider(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
+    address=models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.name
@@ -275,6 +285,7 @@ class Provider(models.Model):
         Provider.objects.create(
             name=provider_data.get("name"),
             email=provider_data.get("email"),
+            address=provider_data.get("address"),
         )
 
         return True, None
@@ -282,7 +293,7 @@ class Provider(models.Model):
     def update_provider(self, provider_data):
         self.name = provider_data.get("name", "") or self.name
         self.email = provider_data.get("email", "") or self.email
-        
+        self.address = provider_data.get("address", "") or self.address
         self.save()
  
 class Product(models.Model):

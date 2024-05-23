@@ -7,6 +7,8 @@ from playwright.sync_api import sync_playwright, expect, Browser
 from django.urls import reverse
 
 from app.models import Client
+
+from app.models import Provider
 from app.models import Pet
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
@@ -245,6 +247,74 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
             "href", reverse("clients_edit", kwargs={"id": client.id})
         )
 
+class ProvidersTestCase(PlaywrightTestCase):
+    def test_should_show_providers_data(self):
+        Provider.objects.create(
+            name="Provider 1",
+            address="123 Main St",
+            email="provider1@example.com",
+        )
+
+        Provider.objects.create(
+            name="Provider 2",
+            address="456 Elm St",
+            email="provider2@example.com",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
+
+        expect(self.page.get_by_text("No existen proveedores")).not_to_be_visible()
+
+        expect(self.page.get_by_text("Provider 1")).to_be_visible()
+        expect(self.page.get_by_text("123 Main St")).to_be_visible()
+        expect(self.page.get_by_text("provider1@example.com")).to_be_visible()
+
+        expect(self.page.get_by_text("Provider 2")).to_be_visible()
+        expect(self.page.get_by_text("456 Elm St")).to_be_visible()
+        expect(self.page.get_by_text("provider2@example.com")).to_be_visible()
+
+    def test_should_show_add_provider_action(self):
+        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
+
+        add_provider_action = self.page.get_by_role(
+            "link", name="Nuevo proveedor", exact=False
+        )
+        expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
+class ProvidersTestCase(PlaywrightTestCase):
+    def test_should_show_providers_data(self):
+        Provider.objects.create(
+            name="Provider 1",
+            address="123 Main St",
+            email="provider1@example.com",
+        )
+
+        Provider.objects.create(
+            name="Provider 2",
+            address="456 Elm St",
+            email="provider2@example.com",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
+
+        expect(self.page.get_by_text("No existen proveedores")).not_to_be_visible()
+
+        expect(self.page.get_by_text("Provider 1")).to_be_visible()
+        expect(self.page.get_by_text("123 Main St")).to_be_visible()
+        expect(self.page.get_by_text("provider1@example.com")).to_be_visible()
+
+        expect(self.page.get_by_text("Provider 2")).to_be_visible()
+        expect(self.page.get_by_text("456 Elm St")).to_be_visible()
+        expect(self.page.get_by_text("provider2@example.com")).to_be_visible()
+
+    def test_should_show_add_provider_action(self):
+        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
+
+        add_provider_action = self.page.get_by_role(
+            "link", name="Nuevo proveedor", exact=False
+        )
+        expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
 class PetsRepoTestCase(PlaywrightTestCase):
     def test_should_show_clients_data(self):
         Pet.objects.create(
@@ -276,8 +346,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
         expect(edit_action).to_have_attribute(
             "href", reverse("pets_edit", kwargs={"id": pet_instance.id})
         )
-
-
 
 
     def test_should_can_be_able_to_delete_a_pet(self):
