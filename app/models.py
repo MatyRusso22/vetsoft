@@ -38,7 +38,6 @@ def validate_pet(data):
         errors["birthday"] = "Por favor ingrese la fecha de nacimiento de la mascota"
     else:
         try:
-            # Convert to date to check format
             if "-" in birthday:
                 datetime.strptime(birthday, "%Y-%m-%d")
             else:
@@ -48,7 +47,7 @@ def validate_pet(data):
 
     if weight == "":
         errors["weight"] = "Por favor ingrese el peso de la mascota"
-    elif not weight.replace('.', '', 1).isdigit():  # Asegurarse de que el peso sea un número válido
+    elif not str(weight).replace('.', '', 1).isdigit():  # Asegurarse de que el peso sea un número válido
         errors["weight"] = "El peso debe ser un número válido"
     elif float(weight) < 0:  # Validar que el peso no sea menor a 0
         errors["weight"] = "El peso no puede ser menor a 0"
@@ -209,7 +208,6 @@ class Pet(models.Model):
         self.name = pet_data.get("name", "") or self.name
         self.breed = pet_data.get("breed", "") or self.breed
         self.birthday = pet_data.get("birthday", "") or self.birthday
-        self.weight = pet_data.get("weight", "") or self.weight
 
         if "birthday" in pet_data:
             birthday_str = pet_data.get("birthday")
@@ -223,9 +221,12 @@ class Pet(models.Model):
 
         weight = float(pet_data.get("weight", 0)) 
         if weight < 0:
-            raise ValueError("El peso no puede ser menor que 0")
+            return False, {"weight": "El peso no puede ser menor que 0"}
 
+        self.weight = weight
         self.save()
+        return True, None
+
 
 class Medicine(models.Model):
     name = models.CharField(max_length=100)
