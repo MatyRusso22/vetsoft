@@ -8,6 +8,7 @@ from django.urls import reverse
 from app.models import Client
 
 from app.models import Provider
+from app.models import Product
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 playwright = sync_playwright().start()
@@ -87,7 +88,7 @@ class ClientsRepoTestCase(PlaywrightTestCase):
         self.page.goto(f"{self.live_server_url}{reverse('clients_repo')}")
 
         expect(self.page.get_by_text("No existen clientes")).not_to_be_visible()
-
+        
         expect(self.page.get_by_text("Juan Sebastián Veron")).to_be_visible()
         expect(self.page.get_by_text("13 y 44")).to_be_visible()
         expect(self.page.get_by_text("221555232")).to_be_visible()
@@ -278,3 +279,195 @@ class ProvidersTestCase(PlaywrightTestCase):
             "link", name="Nuevo proveedor", exact=False
         )
         expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
+class ProductsRepoTestCase(PlaywrightTestCase):
+    def test_should_show_message_if_table_is_empty(self):
+        self.page.goto(f"{self.live_server_url}{reverse('products_repo')}")
+
+        expect(self.page.get_by_text("No existen productos")).to_be_visible()
+
+    def test_should_show_products_data(self):
+        Product.objects.create(
+            name="Peine",
+            type="Higiene",
+            price=100.0,
+        )
+
+        Product.objects.create(
+            name="Pelota",
+            type="Juguete",
+            price=150.0,
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('products_repo')}")
+
+        expect(self.page.get_by_text("No existen productos")).not_to_be_visible() 
+        expect(self.page.get_by_text("Peine")).to_be_visible()
+        expect(self.page.get_by_text("Higiene")).to_be_visible()
+        expect(self.page.get_by_text("100.0")).to_be_visible()
+
+        expect(self.page.get_by_text("Pelota")).to_be_visible()
+        expect(self.page.get_by_text("Juguete")).to_be_visible()
+        expect(self.page.get_by_text("150.0")).to_be_visible()
+
+    def test_should_show_add_product_action(self):
+        self.page.goto(f"{self.live_server_url}{reverse('products_repo')}")
+
+        add_product_action = self.page.get_by_role(
+            "link", name="Nuevo producto", exact=False
+        )
+        expect(add_product_action).to_have_attribute("href", reverse("products_form"))
+
+    def test_should_show_product_edit_action(self):
+        product = Product.objects.create(
+            name="Peine",
+            type="Higiene",
+            price=100.0,
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('products_repo')}")
+
+        edit_action = self.page.get_by_role("link", name="Editar")
+        expect(edit_action).to_have_attribute(
+            "href", reverse("products_edit", kwargs={"id": product.id})
+        )
+
+    def test_should_show_product_delete_action(self):
+        product = Product.objects.create(
+            name="Peine",
+            type="Higiene",
+            price=100.0,
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('products_repo')}")
+
+        delete_form = self.page.get_by_role(
+            "form", name="Formulario de eliminación de producto"
+        )
+        product_id_input = delete_form.locator("input[name=product_id]")
+
+        expect(delete_form).to_be_visible()
+        expect(delete_form).to_have_attribute("action", reverse("products_delete"))
+        expect(product_id_input).not_to_be_visible()
+        expect(product_id_input).to_have_value(str(product.id))
+        expect(delete_form.get_by_role("button", name="Eliminar")).to_be_visible()
+
+    def test_should_be_able_to_delete_a_product(self):
+        Product.objects.create(
+            name="Peine",
+            type="Higiene",
+            price="100.0",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('products_repo')}")
+
+        expect(self.page.get_by_text("Peine")).to_be_visible()
+
+        def is_delete_response(response):
+            return response.url.find(reverse("products_delete")) != -1
+
+        with self.page.expect_response(is_delete_response) as response_info:
+            self.page.get_by_role("button", name="Eliminar").click()
+
+        response = response_info.value
+        self.assertTrue(response.status < 400)
+
+        expect(self.page.get_by_text("Peine")).not_to_be_visible()
+
+
+class ProductCreateEditTestCase(PlaywrightTestCase):
+    def test_should_be_able_to_create_a_new_product(self):
+        self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Peine")
+        self.page.get_by_label("Tipo").fill("Higiene")
+        self.page.get_by_label("Precio").fill("100.0")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Peine")).to_be_visible()
+        expect(self.page.get_by_text("Higiene")).to_be_visible()
+        expect(self.page.get_by_text("100.0")).to_be_visible()
+
+    def test_should_view_errors_if_form_is_invalid(self):
+        self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor ingrese un nombre para el producto")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese el tipo del producto")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese el precio del producto")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Peine")
+        self.page.get_by_label("Tipo").fill("Higiene")
+        self.page.get_by_label("Precio").fill("-10.0")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor ingrese un precio del producto mayor que cero")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Peine")
+        self.page.get_by_label("Tipo").fill("Higiene")
+        self.page.get_by_label("Precio").fill("0")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor ingrese un precio del producto mayor que cero")).to_be_visible()
+
+    def test_should_be_able_to_edit_a_product(self):
+        product = Product.objects.create(
+            name="Peine",
+            type="Higiene",
+            price=100.0,
+        )
+
+        path = reverse("products_edit", kwargs={"id": product.id})
+        self.page.goto(f"{self.live_server_url}{path}")
+
+        self.page.get_by_label("Nombre").fill("Pelota")
+        self.page.get_by_label("Tipo").fill("Juguete")
+        self.page.get_by_label("Precio").fill("150.0")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Peine")).not_to_be_visible()
+        expect(self.page.get_by_text("Higiene")).not_to_be_visible()
+        expect(self.page.get_by_text("100.0")).not_to_be_visible()
+
+        expect(self.page.get_by_text("Pelota")).to_be_visible()
+        expect(self.page.get_by_text("Juguete")).to_be_visible()
+        expect(self.page.get_by_text("150.0")).to_be_visible()
+
+    def test_should_view_errors_if_edit_form_is_invalid(self):
+        product = Product.objects.create(
+            name="Peine",
+            type="Higiene",
+            price=100.0,
+        )
+
+        path = reverse("products_edit", kwargs={"id": product.id})
+        self.page.goto(f"{self.live_server_url}{path}")
+
+        self.page.get_by_label("Nombre").fill("Pelota")
+        self.page.get_by_label("Tipo").fill("Juguete")
+        self.page.get_by_label("Precio").fill("150.0")
+
+        self.page.get_by_label("Nombre").fill("Peine")
+        self.page.get_by_label("Tipo").fill("Higiene")
+        self.page.get_by_label("Precio").fill("-10.0")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor ingrese un precio del producto mayor que cero")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Peine")
+        self.page.get_by_label("Tipo").fill("Higiene")
+        self.page.get_by_label("Precio").fill("0")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor ingrese un precio del producto mayor que cero")).to_be_visible()
