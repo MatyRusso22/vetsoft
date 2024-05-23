@@ -1,6 +1,7 @@
 from django.test import TestCase
 from app.models import Client
 from app.models import Provider
+from app.models import Medicine
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):
@@ -109,3 +110,61 @@ class ProviderModelTest(TestCase):
         provider_updated = Provider.objects.get(pk=1)
 
         self.assertEqual(provider_updated.address, "ElSalvador 245")
+
+
+
+
+
+
+
+class MedicineModelTest(TestCase):
+    def test_can_create_and_get_medicine_with_valid_dose(self):
+        Medicine.save_medicine(
+            {
+                "name": "Ibuprofeno",
+                "descripcion": "Dolores de cabeza",
+                "dosis": "2",
+            }
+        )
+        medicines = Medicine.objects.all()
+        self.assertEqual(len(medicines), 1)
+
+        self.assertEqual(medicines[0].name, "Ibuprofeno")
+        self.assertEqual(medicines[0].descripcion, "Dolores de cabeza")
+        self.assertEqual(medicines[0].dosis, "2")
+
+    def test_validation_invalid_dose_cero(self):
+        Medicine.save_medicine(
+            {
+                "name": "Paracetamol",
+                "descripcion": "Dolores de cabeza",
+                "dosis": "0",
+            }
+        )
+        medicine = Medicine.objects.get(pk=1)
+
+        self.assertEqual(medicine.dosis, "0")
+
+        medicine.update_medicine({"dosis": "7"})
+
+        medicine_updated = Medicine.objects.get(pk=1)
+
+        self.assertEqual(medicine_updated.dosis, "7")
+
+    def test_update_medicine_with_error(self):
+        Medicine.save_medicine(
+            {
+                "name": "Paracetamol",
+                "descripcion": "Dolores de cabeza",
+                "dosis": "15",
+            }
+        )
+        medicine = Medicine.objects.get(pk=1)
+
+        self.assertEqual(medicine.dosis, "15")
+
+        medicine.update_medicine({"dosis": ""})
+
+        medicine_updated = Medicine.objects.get(pk=1)
+
+        self.assertEqual(medicine_updated.dosis, "15")
