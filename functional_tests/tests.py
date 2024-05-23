@@ -9,6 +9,8 @@ from app.models import Client
 
 from app.models import Provider
 
+from app.models import Medicine
+
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 playwright = sync_playwright().start()
 headless = os.environ.get("HEADLESS", 1) == 1
@@ -66,7 +68,6 @@ class HomeTestCase(PlaywrightTestCase):
 class ClientsRepoTestCase(PlaywrightTestCase):
     def test_should_show_message_if_table_is_empty(self):
         self.page.goto(f"{self.live_server_url}{reverse('clients_repo')}")
-
         expect(self.page.get_by_text("No existen clientes")).to_be_visible()
 
     def test_should_show_clients_data(self):
@@ -278,3 +279,38 @@ class ProvidersTestCase(PlaywrightTestCase):
             "link", name="Nuevo proveedor", exact=False
         )
         expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
+
+class MedicinesTestCase(PlaywrightTestCase):
+    def test_should_show_medicines_data(self):
+        Medicine.objects.create(
+            name="Ibuprofeno",
+            descripcion="Dolores de cabeza",
+            dosis="5",
+        )
+
+        Medicine.objects.create(
+            name="Buscapina",
+            descripcion="Dolores de estomago",
+            dosis="10",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('medicines_repo')}")
+
+        expect(self.page.get_by_text("No existen medicamentos")).not_to_be_visible()
+
+        expect(self.page.get_by_text("Ibuprofeno")).to_be_visible()
+        expect(self.page.get_by_text("Dolores de cabeza")).to_be_visible()
+        expect(self.page.get_by_text("5")).to_be_visible()
+
+        expect(self.page.get_by_text("Buscapina")).to_be_visible()
+        expect(self.page.get_by_text("Dolores de estomago")).to_be_visible()
+        expect(self.page.get_by_text("10")).to_be_visible()
+
+    def test_should_show_add_medicine_action(self):
+        self.page.goto(f"{self.live_server_url}{reverse('medicines_repo')}")
+
+        add_medicine_action = self.page.get_by_role(
+            "link", name="Nuevo medicamento", exact=False
+        )
+        expect(add_medicine_action).to_have_attribute("href", reverse("medicines_form"))
