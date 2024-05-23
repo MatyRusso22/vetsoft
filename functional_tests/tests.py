@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from playwright.sync_api import sync_playwright, expect, Browser
@@ -8,6 +9,7 @@ from django.urls import reverse
 from app.models import Client
 
 from app.models import Provider
+from app.models import Pet
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 playwright = sync_playwright().start()
@@ -278,3 +280,94 @@ class ProvidersTestCase(PlaywrightTestCase):
             "link", name="Nuevo proveedor", exact=False
         )
         expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
+class ProvidersTestCase(PlaywrightTestCase):
+    def test_should_show_providers_data(self):
+        Provider.objects.create(
+            name="Provider 1",
+            address="123 Main St",
+            email="provider1@example.com",
+        )
+
+        Provider.objects.create(
+            name="Provider 2",
+            address="456 Elm St",
+            email="provider2@example.com",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
+
+        expect(self.page.get_by_text("No existen proveedores")).not_to_be_visible()
+
+        expect(self.page.get_by_text("Provider 1")).to_be_visible()
+        expect(self.page.get_by_text("123 Main St")).to_be_visible()
+        expect(self.page.get_by_text("provider1@example.com")).to_be_visible()
+
+        expect(self.page.get_by_text("Provider 2")).to_be_visible()
+        expect(self.page.get_by_text("456 Elm St")).to_be_visible()
+        expect(self.page.get_by_text("provider2@example.com")).to_be_visible()
+
+    def test_should_show_add_provider_action(self):
+        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
+
+        add_provider_action = self.page.get_by_role(
+            "link", name="Nuevo proveedor", exact=False
+        )
+        expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
+class PetsRepoTestCase(PlaywrightTestCase):
+    def test_should_show_clients_data(self):
+        Pet.objects.create(
+            name="Roma",
+            breed="Labrador",
+            weight="20",
+            birthday="2018-02-11",
+        )
+        Pet.objects.create(
+            name="Toto",
+            breed="Schnauzer",
+            weight="15",
+            birthday="2008-05-05",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
+
+    def test_should_show_pet_edit_action(self):
+        pet_instance = Pet.objects.create(
+            name="Roma",
+            breed="Labrador",
+            weight="20",
+            birthday=datetime.strptime("11-02-2018", "%d-%m-%Y").strftime("%Y-%m-%d"),
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
+
+        edit_action = self.page.get_by_role("link", name="Editar")
+        expect(edit_action).to_have_attribute(
+            "href", reverse("pets_edit", kwargs={"id": pet_instance.id})
+        )
+
+
+    def test_should_can_be_able_to_delete_a_pet(self):
+        Pet.objects.create(
+            name="Lola",
+            breed="",
+            weight="22",
+            birthday="2019-08-08",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
+
+        expect(self.page.get_by_text("Lola")).to_be_visible()
+
+        def is_delete_response(response):
+            return response.url.find(reverse("pets_delete"))
+
+        # verificamos que el envio del formulario fue exitoso
+        with self.page.expect_response(is_delete_response) as response_info:
+            self.page.get_by_role("button", name="Eliminar").click()
+
+        response = response_info.value
+        self.assertTrue(response.status < 400)
+
+        expect(self.page.get_by_text("Lola")).not_to_be_visible()
