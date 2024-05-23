@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.shortcuts import reverse
 from app.models import Client
 from app.models import Provider
+from app.models import Pet
 from app.models import Product
 
 
@@ -170,6 +171,37 @@ class ProvidersTest(TestCase):
         self.assertEqual(editedProvider.name, "Carlos Tevez")
         self.assertEqual(editedProvider.address, "San Martin 212")
         self.assertEqual(editedProvider.email, provider.email)
+
+class PetsTest(TestCase):
+    def test_edit_pet_with_negative_weight(self):
+        pet = Pet.objects.create(
+            name="Roma",
+            breed="",
+            weight=25,
+            birthday="2020-02-02",
+        )
+
+        # Intento modificar que el peso sea negativo
+        response = self.client.post(
+            reverse("pets_form"),
+            data={
+                "id": pet.id,
+                "name": "Roma",
+                "breed": "",
+                "weight": -30,  # Peso negativo
+                "birthday": "2020-02-02",
+            },
+        )
+
+        # Deberia tirar error, con un codigo 302 (osea que hubo un error)
+        self.assertEqual(response.status_code, 302)
+
+        # Y no se modificaria nada
+        editedPet = Pet.objects.get(pk=pet.id)
+        self.assertEqual(editedPet.name, "Roma")
+        self.assertEqual(editedPet.breed, "")
+        self.assertEqual(editedPet.weight, 25)
+        self.assertEqual(editedPet.birthday.strftime('%Y-%m-%d'), "2020-02-02")
 
 class ProductTest(TestCase):
  

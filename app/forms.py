@@ -9,7 +9,7 @@ from .models import Vet
 class PetForm(forms.ModelForm):
     class Meta:
         model = Pet
-        fields = ['name', 'breed', 'birthday']
+        fields = ['name', 'breed', 'weight', 'birthday']
 
 class MedicineForm(forms.ModelForm):
     class Meta:

@@ -2,6 +2,10 @@ from django.test import TestCase
 from app.models import Client
 from app.models import Provider
 from app.models import Product,validate_product
+from app.models import Pet
+from datetime import datetime
+
+
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):
@@ -154,3 +158,27 @@ class ProductModelTest(TestCase):
            } )
         product_updated = Product.objects.get(pk=1)
         self.assertEqual(product_updated.price, 200.0)
+      
+class PetModelTest(TestCase):
+    def test_update_pet_with_negative_weight(self):
+        # Crear una mascota
+        pet = Pet.objects.create(
+            name="Roma",
+            breed="",
+            weight=25,
+            birthday="2020-02-02",
+        )
+
+        # Intentar actualizar con un peso negativo
+        success, errors = pet.update_pet({
+            "name": "Roma",
+            "breed": "",
+            "weight": -30,  # Peso negativo
+            "birthday": "2020-02-02",
+        })
+
+        # Debería fallar, así que success debería ser False
+        self.assertFalse(success)
+
+        # Verificar que el número de teléfono no haya cambiado
+        self.assertEqual(pet.weight, 25)
