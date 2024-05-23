@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.urls import reverse
 from .models import Client 
 from .models import Pet
 from .forms import PetForm
@@ -61,10 +62,9 @@ def pets_repository(request):
 def pets_form(request, id=None):
     errors = {}
     pet = None
+    saved = True
 
     if request.method == "POST":
-        saved = True
-
         pet_id = request.POST.get("id") if "id" in request.POST else None
 
         if pet_id is None:
@@ -75,6 +75,7 @@ def pets_form(request, id=None):
                 pet.update_pet(request.POST)
             except ValueError as e:
                 errors["weight"] = str(e)
+                saved = False
 
         if saved:
             return redirect(reverse("pets_repo"))
