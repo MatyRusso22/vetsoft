@@ -51,7 +51,13 @@ def validate_medicine(data):
     
     if dosis == "":
         errors["dosis"] = "Por favor ingrese una dosis"
-
+    else: 
+        try:
+            dosis_entero = int(dosis)
+            if dosis_entero <= 0:
+                errors['dosis'] = "La dosis debe ser mayor a cero"
+        except ValueError:
+            errors['dosis'] = "La cantidad de dosis debe ser un numero entero"
     return errors
 
 def validate_provider(data):
@@ -186,7 +192,7 @@ class Pet(models.Model):
 class Medicine(models.Model):
     name = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=100, blank=True)
-    dosis = models.CharField(max_length=100, blank=True)
+    dosis = models.IntegerField()
 
     def __str__(self):
         return self.name
