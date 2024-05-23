@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+from django.core.exceptions import ValidationError
 
 
 def validate_client(data):
@@ -37,19 +38,20 @@ def validate_pet(data):
         errors["birthday"] = "Por favor ingrese la fecha de nacimiento de la mascota"
     else:
         try:
-            datetime.strptime(birthday, "%d-%m-%Y")
+            # Convert to date to check format
+            if "-" in birthday:
+                datetime.strptime(birthday, "%Y-%m-%d")
+            else:
+                datetime.strptime(birthday, "%d-%m-%Y")
         except ValueError:
-            errors["birthday"] = "La fecha de nacimiento debe tener el formato DD-MM-YYYY"
+            errors["birthday"] = "El formato de la fecha debe ser YYYY-MM-DD o DD-MM-YYYY"
 
     if weight == "":
         errors["weight"] = "Por favor ingrese el peso de la mascota"
-    else:
-        try:
-            weight = float(weight)
-            if weight < 0:
-                errors["weight"] = "El peso no puede ser menor a 0"
-        except ValueError:
-            errors["weight"] = "El peso debe ser un número válido"
+    elif not weight.replace('.', '', 1).isdigit():  # Asegurarse de que el peso sea un número válido
+        errors["weight"] = "El peso debe ser un número válido"
+    elif float(weight) < 0:  # Validar que el peso no sea menor a 0
+        errors["weight"] = "El peso no puede ser menor a 0"
 
     return errors
 
@@ -179,29 +181,50 @@ class Pet(models.Model):
     @classmethod
     def save_pet(cls, pet_data):
         errors = validate_pet(pet_data)
-        if errors:
+
+        if len(errors.keys()) > 0:
             return False, errors
-        
-        birthday = datetime.strptime(pet_data["birthday"], "%d-%m-%Y").date()
+
+        birthday_str = pet_data.get("birthday")
+        try:
+            # Convert birthday to date object
+            if "-" in birthday_str:
+                birthday = datetime.strptime(birthday_str, "%Y-%m-%d").date()
+            else:
+                birthday = datetime.strptime(birthday_str, "%d-%m-%Y").date()
+        except ValueError:
+            errors["birthday"] = "El formato de la fecha debe ser YYYY-MM-DD o DD-MM-YYYY"
+            return False, errors
 
         Pet.objects.create(
             name=pet_data.get("name"),
             breed=pet_data.get("breed"),
             birthday=birthday,
-            weight=float(pet_data.get("weight")),
+            weight=pet_data.get("weight"),
         )
+
         return True, None
 
     def update_pet(self, pet_data):
-        if "birthday" in pet_data and pet_data["birthday"]:
-            self.birthday = datetime.strptime(pet_data["birthday"], "%d-%m-%Y").date()
-        if "weight" in pet_data:
-            weight = float(pet_data["weight"])
-            if weight < 0:
-                raise ValueError("El peso no puede ser menor que 0")
-            self.weight = weight
-        self.name = pet_data.get("name", self.name)
-        self.breed = pet_data.get("breed", self.breed)
+        self.name = pet_data.get("name", "") or self.name
+        self.breed = pet_data.get("breed", "") or self.breed
+        self.birthday = pet_data.get("birthday", "") or self.birthday
+        self.weight = pet_data.get("weight", "") or self.weight
+
+        if "birthday" in pet_data:
+            birthday_str = pet_data.get("birthday")
+            try:
+                if "-" in birthday_str:
+                    self.birthday = datetime.strptime(birthday_str, "%Y-%m-%d").date()
+                else:
+                    self.birthday = datetime.strptime(birthday_str, "%d-%m-%Y").date()
+            except ValueError:
+                raise ValidationError("El formato de la fecha debe ser YYYY-MM-DD o DD-MM-YYYY")
+
+        weight = float(pet_data.get("weight", 0)) 
+        if weight < 0:
+            raise ValueError("El peso no puede ser menor que 0")
+
         self.save()
 
 class Medicine(models.Model):
