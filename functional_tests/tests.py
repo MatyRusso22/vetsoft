@@ -286,13 +286,13 @@ class MedicinesTestCase(PlaywrightTestCase):
         Medicine.objects.create(
             name="Ibuprofeno",
             descripcion="Dolores de cabeza",
-            dosis="5",
+            dosis=5,
         )
 
         Medicine.objects.create(
             name="Buscapina",
             descripcion="Dolores de estomago",
-            dosis="10",
+            dosis=10,
         )
 
         self.page.goto(f"{self.live_server_url}{reverse('medicines_repo')}")
