@@ -183,7 +183,7 @@ class MedicinesTest(TestCase):
             data={
                 "name": "Ibuprofeno",
                 "descripcion": "Dolores de cabeza",
-                "dosis": "2",
+                "dosis": 2,
             },
         )
         medicines = Medicine.objects.all()
@@ -191,7 +191,7 @@ class MedicinesTest(TestCase):
 
         self.assertEqual(medicines[0].name, "Ibuprofeno")
         self.assertEqual(medicines[0].descripcion, "Dolores de cabeza")
-        self.assertEqual(medicines[0].dosis, "2")
+        self.assertEqual(medicines[0].dosis, 2)
 
         self.assertRedirects(response, reverse("medicines_repo"))
 
@@ -215,7 +215,7 @@ class MedicinesTest(TestCase):
         medicine = Medicine.objects.create(
             name="Ibuprofeno",
             descripcion="Dolores de cabeza",
-            dosis="5",
+            dosis= 5,
         )
 
         response = self.client.post(
@@ -224,7 +224,7 @@ class MedicinesTest(TestCase):
                 "id": medicine.id,
                 "name": "Ibuprofeno",
                 "descripcion":"Dolores de cabeza",
-                "dosis": "15",
+                "dosis": 15,
             },
         )
 
@@ -233,4 +233,4 @@ class MedicinesTest(TestCase):
         editedMedicine = Medicine.objects.get(pk=medicine.id)
         self.assertEqual(editedMedicine.name, "Ibuprofeno")
         self.assertEqual(editedMedicine.descripcion, "Dolores de cabeza")
-        self.assertEqual(editedMedicine.dosis, "15")
+        self.assertEqual(editedMedicine.dosis, 15)
