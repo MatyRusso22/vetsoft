@@ -69,13 +69,15 @@ def validate_medicine(data):
     
     if dosis == "":
         errors["dosis"] = "Por favor ingrese una dosis"
+    elif dosis <= 0:
+        errors['dosis'] = "La dosis debe ser mayor a cero"
     else: 
         try:
-            dosis_entero = int(dosis)
-            if dosis_entero <= 0:
-                errors['dosis'] = "La dosis debe ser mayor a cero"
+            dosis = float(dosis)
+            if not (1 <= dosis <= 10):
+                errors["dosis"] = "La dosis debe estar entre 1 y 10"
         except ValueError:
-            errors['dosis'] = "La cantidad de dosis debe ser un numero entero"
+            errors["dosis"] = "La cantidad de dosis no es correcta"
     return errors
 
 def validate_provider(data):
