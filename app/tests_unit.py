@@ -123,7 +123,7 @@ class MedicineModelTest(TestCase):
             {
                 "name": "Ibuprofeno",
                 "descripcion": "Dolores de cabeza",
-                "dosis": "2",
+                "dosis": 2,
             }
         )
         medicines = Medicine.objects.all()
@@ -131,40 +131,40 @@ class MedicineModelTest(TestCase):
 
         self.assertEqual(medicines[0].name, "Ibuprofeno")
         self.assertEqual(medicines[0].descripcion, "Dolores de cabeza")
-        self.assertEqual(medicines[0].dosis, "2")
+        self.assertEqual(medicines[0].dosis, 2)
 
     def test_validation_invalid_dose_cero(self):
         Medicine.save_medicine(
             {
                 "name": "Paracetamol",
                 "descripcion": "Dolores de cabeza",
-                "dosis": "0",
+                "dosis": 0,
             }
         )
         medicine = Medicine.objects.get(pk=1)
 
-        self.assertEqual(medicine.dosis, "0")
+        self.assertEqual(medicine.dosis, 0)
 
-        medicine.update_medicine({"dosis": "7"})
+        medicine.update_medicine({"dosis": 7})
 
         medicine_updated = Medicine.objects.get(pk=1)
 
-        self.assertEqual(medicine_updated.dosis, "7")
+        self.assertEqual(medicine_updated.dosis, 7)
 
     def test_update_medicine_with_error(self):
         Medicine.save_medicine(
             {
                 "name": "Paracetamol",
                 "descripcion": "Dolores de cabeza",
-                "dosis": "15",
+                "dosis": 15,
             }
         )
         medicine = Medicine.objects.get(pk=1)
 
-        self.assertEqual(medicine.dosis, "15")
+        self.assertEqual(medicine.dosis, 15)
 
         medicine.update_medicine({"dosis": ""})
 
         medicine_updated = Medicine.objects.get(pk=1)
 
-        self.assertEqual(medicine_updated.dosis, "15")
+        self.assertEqual(medicine_updated.dosis, 15)
