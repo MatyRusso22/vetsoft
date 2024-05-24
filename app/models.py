@@ -100,24 +100,26 @@ def validate_provider(data):
 
 def validate_product(data):
     errors = {}
+    
     name = data.get("name","")
     type = data.get("type","")
     price = data.get("price","")
 
     if name == "":
-        errors['name'] = 'Por favor ingrese un nombre para el producto'
-    if type == "":
-        errors['type'] = 'Por favor ingrese el tipo del producto'
-    if price == "":
-        errors['price'] = 'Por favor ingrese el precio del producto'
-    else:
-        try:
-            price_float = float(price)
-            if price_float <= 0:
-                errors['price'] = 'Por favor ingrese un precio del producto mayor que cero'
-        except ValueError:
-            errors['price'] = 'Por favor ingrese un precio válido para el producto'
+        errors["name"] = "Por favor ingrese un nombre para el producto"
+        
+    if type =="":
+        errors["type"] = "Por favor ingrese el tipo del producto"
 
+    if price == "" :
+        errors["price"] = "Por favor ingrese el precio del producto"
+    else:
+        try: 
+            if float(price) <= 0:
+                errors["price"] = "Por favor ingrese un precio del producto mayor que cero"
+        except ValueError:
+            errors["price"] = "Por favor ingrese un precio valido para el producto"
+  
     return errors
 
 
@@ -319,11 +321,18 @@ class Product(models.Model):
         return True, None
 
     def update_product(self, product_data):
+        errors = validate_product(product_data)  
+
+        if len(errors.keys()) > 0:
+            return False, errors
+        
         self.name = product_data.get("name", "") or self.name
-        self.type = product_data.get("type", "") or self.descripcion
+        self.type = product_data.get("type", "") or self.type
         self.price = product_data.get("price", "") or self.price
 
         self.save()
+        
+        return True, None
 
 class Vet(models.Model):
     name = models.CharField(max_length=100)

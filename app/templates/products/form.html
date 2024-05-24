@@ -4,65 +4,71 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-6 offset-lg-3">
-            <h1>{{ form_title }}</h1>
+            {% if product.id %}
+                <h1>Editar producto</h1>
+            {% else %}
+                <h1>Nuevo producto</h1>
+            {% endif %}
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-6 offset-lg-3">
             <form class="vstack gap-3 {% if errors %}was-validated{% endif %}"
-            aria-label="Formulario de  {{ form_title|lower }} "
+                aria-label="Formulario de creacion de producto"
                 method="POST"
-                action="{% if form_action %}{% url form_action %}{% else %}{% url 'products_form' %}{% endif %}"
+                action="{% url 'products_form' %}"
                 novalidate>
 
                 {% csrf_token %}
 
-                {% if form.instance.id %}
-                    <input type="hidden" value="{{ form.instance.id }}" name="id" />
-                {% endif %}
+                <input type="hidden" value="{{ product.id }}" name="id" />
 
                 <div>
                     <label for="name" class="form-label">Nombre</label>
                     <input type="text"
                         id="name"
                         name="name"
-                        value="{{ form.instance.name }}"
+                        value="{{product.name}}"
                         class="form-control"
                         required/>
 
-                    {% if form.errors.name %}
+                    {% if errors.name %}
                         <div class="invalid-feedback">
-                            {{ form.errors.name }}
+                            {{ errors.name }}
                         </div>
                     {% endif %}
                 </div>
                 <div>
                     <label for="type" class="form-label">Tipo</label>
-                    <input type="text"
+                    <input type="type"
                         id="type"
                         name="type"
                         class="form-control"
-                        value="{{ form.instance.type }}"
+                        value="{{product.type}}"
                         required/>
-                        {% if form.errors.type %}
+
+                    {% if errors.type %}
                         <div class="invalid-feedback">
-                            {{ form.errors.type }}
+                            {{ errors.type }}
                         </div>
                     {% endif %}
                 </div>
+
                 <div>
                     <label for="price" class="form-label">Precio</label>
-                    <input type="text"
+                    <input type="number"
+                        step="0.01"
+                        min="0.01"
                         id="price"
                         name="price"
                         class="form-control"
-                        value="{{ form.instance.price }}"
+                        value="{{ product.price }}"
                         required/>
 
-                    {% if form.errors.price %}
+                    {% if errors.price %}
                         <div class="invalid-feedback">
-                            {{ form.errors.price }}
+                            {{ errors.price }}
                         </div>
                     {% endif %}
                 </div>
@@ -72,4 +78,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
