@@ -103,7 +103,7 @@ def validate_Vet(data):
     name = data.get("name", "")
     email = data.get("email", "")
     phone = data.get("phone", "")
-    
+    speciality = data.get("speciality", "")
 
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
@@ -115,6 +115,9 @@ def validate_Vet(data):
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
+
+    if speciality == "":
+        errors["speciality"] = "Por favor ingrese una especialidad"
  
 
     return errors
@@ -275,6 +278,7 @@ class Vet(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=10)
+    speciality = models.CharField(max_length=100, default='General')
 
     def __str__(self):
         return self.name
@@ -289,7 +293,7 @@ class Vet(models.Model):
             name=vet_data.get("name"),
             email=vet_data.get("email"),
             phone=vet_data.get("phone"),
-                      
+            speciality=vet_data.get("speciality"),          
         )
 
         return True, None
@@ -298,8 +302,13 @@ class Vet(models.Model):
         self.name = vet_data.get("name", "") or self.name
         self.email = vet_data.get("email", "") or self.email  
         self.phone = vet_data.get("phone", "") or self.phone
-          
+        self.speciality = vet_data.get("speciality", "") or self.speciality  
         self.save()
  
-
+class EspecialidadVeterinario(models.TextChoices):
+    GENERAL = 'General', 'General'
+    CIRUGIA = 'Cirugía', 'Cirugía'
+    DERMATOLOGIA = 'Dermatología', 'Dermatología'
+    ODONTOLOGIA = 'Odontología', 'Odontología'
+    OTRA = 'Otra', 'Otra'
        
