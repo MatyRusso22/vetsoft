@@ -120,9 +120,7 @@ class ClientsRepoTestCase(PlaywrightTestCase):
         self.page.goto(f"{self.live_server_url}{reverse('clients_repo')}")
 
         edit_action = self.page.get_by_role("link", name="Editar")
-        expect(edit_action).to_have_attribute(
-            "href", reverse("clients_edit", kwargs={"id": client.id})
-        )
+        expect(edit_action).to_have_attribute("href", reverse("clients_edit", kwargs={"id": client.id}))
 
     def test_should_show_client_delete_action(self):
         client = Client.objects.create(
@@ -207,13 +205,8 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         self.page.get_by_role("button", name="Guardar").click()
 
         expect(self.page.get_by_text("Por favor ingrese un nombre")).not_to_be_visible()
-        expect(
-            self.page.get_by_text("Por favor ingrese un teléfono")
-        ).not_to_be_visible()
-
-        expect(
-            self.page.get_by_text("Por favor ingrese un email valido")
-        ).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un teléfono")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un email valido")).to_be_visible()
 
     def test_should_be_able_to_edit_a_client(self):
         client = Client.objects.create(
@@ -316,6 +309,45 @@ class MedicinesTestCase(PlaywrightTestCase):
             "link", name="Nuevo medicamento", exact=False
         )
         expect(add_medicine_action).to_have_attribute("href", reverse("medicines_form"))
+    
+
+    def test_should_can_be_able_to_delete_a_medicine(self):
+        Medicine.objects.create(
+            name="Buscapina",
+            descripcion="Dolor de panza",
+            dosis="5",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('medicines_repo')}")
+
+        expect(self.page.get_by_text("Buscapina")).to_be_visible()
+
+    def test_should_view_errors_if_form_is_invalid(self):
+        self.page.goto(f"{self.live_server_url}{reverse('medicines_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor ingrese un nombre para el medicamento")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese una descripcion")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese una dosis")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Paracetamol")
+        self.page.get_by_label("Descripcion").fill("Dolor de cabeza")
+        self.page.get_by_label("Dosis").fill("-10.0")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("La dosis debe ser mayor a cero")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Ibuprofeno")
+        self.page.get_by_label("Descripcion").fill("Dolor de cabeza")
+        self.page.get_by_label("Dosis").fill("15")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("La dosis debe ser menor que 10")).to_be_visible()
 
 class ProductsRepoTestCase(PlaywrightTestCase):
     def test_should_show_message_if_table_is_empty(self):
@@ -350,9 +382,7 @@ class ProductsRepoTestCase(PlaywrightTestCase):
     def test_should_show_add_product_action(self):
         self.page.goto(f"{self.live_server_url}{reverse('products_repo')}")
 
-        add_product_action = self.page.get_by_role(
-            "link", name="Nuevo producto", exact=False
-        )
+        add_product_action = self.page.get_by_role("link", name="Nuevo producto", exact=False)
         expect(add_product_action).to_have_attribute("href", reverse("products_form"))
 
     def test_should_show_product_edit_action(self):
@@ -508,6 +538,7 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
         self.page.get_by_role("button", name="Guardar").click()
 
         expect(self.page.get_by_text("Por favor ingrese un precio del producto mayor que cero")).to_be_visible()
+
 
 class ProvidersTestCase(PlaywrightTestCase):
     def test_should_show_providers_data(self):
