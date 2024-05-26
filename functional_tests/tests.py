@@ -277,6 +277,21 @@ class ProvidersTestCase(PlaywrightTestCase):
         )
         expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
 
+class VetTestCase(PlaywrightTestCase):
+    def test_should_show_vet_edit_action(self):
+        vet = Vet.objects.create(
+            name="Juan Sebastián Veron",
+            email="brujita75@hotmail.com",
+            phone="221555232",
+            speciality="EspecialidadVeterinario.CIRUGIA",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('vet_repo')}")
+
+        edit_action = self.page.get_by_role("link", name="Editar")
+        expect(edit_action).to_have_attribute("href", reverse("vet_edit", kwargs={"id": vet.id}))
+
+
 class MedicinesTestCase(PlaywrightTestCase):
     def test_should_show_medicines_data(self):
         Medicine.objects.create(
