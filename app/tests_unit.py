@@ -1,5 +1,5 @@
 from django.test import TestCase
-from app.models import Client
+from app.models import Client, validate_medicine
 from app.models import Provider
 from app.models import Medicine
 from app.models import Product,validate_product
@@ -118,8 +118,6 @@ class ProviderModelTest(TestCase):
 
 
 
-
-
 class MedicineModelTest(TestCase):
     def test_can_create_and_get_medicine_with_valid_dose(self):
         Medicine.save_medicine(
@@ -136,25 +134,17 @@ class MedicineModelTest(TestCase):
         self.assertEqual(medicines[0].descripcion, "Dolores de cabeza")
         self.assertEqual(medicines[0].dosis, 2)
 
-    def test_validation_invalid_dose_cero(self):
-        medicine = Medicine.save_medicine(
-            {
-                "name": "Paracetamol",
-                "descripcion": "Dolores de cabeza",
-                "dosis": 5,
-            }
-        )
-    
-        errors = medicine.update_medicine({
-                "name": "Paracetamol",
-                "descripcion": "Dolores de cabeza",
-                "dosis": 0,
-            })
-        
-        self.assertIn("dosis", errors)
-        self.assertEqual(errors["dosis"], "La dosis debe ser mayor a cero")
+    def test_validate_product_dosis(self):
+        data = {
+            'name': 'Paracetamol',
+            'descripcion': 'Dolores de cabeza',
+            'dosis': -100
+        }
+        errors = validate_medicine(data)
+        self.assertIn('dosis', errors)
+        self.assertEqual(errors['dosis'], 'La dosis debe ser mayor a cero')
 
-    
+
 class ProductModelTest(TestCase):
 
     def test_validate_product_price(self):
@@ -198,7 +188,8 @@ class ProductModelTest(TestCase):
            } )
         product_updated = Product.objects.get(pk=1)
         self.assertEqual(product_updated.price, 200.0)
-      
+
+
 class PetModelTest(TestCase):
     def test_update_pet_with_negative_weight(self):
         # Crear una mascota
