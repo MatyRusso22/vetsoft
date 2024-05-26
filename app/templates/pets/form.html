@@ -58,21 +58,21 @@
                             {{ form.errors.weight }}
                         </div>
                     {% endif %}
-                    <div>
-                        <label for="birthday" class="form-label">Fecha de Nacimiento</label>
-                        <input type="date" 
-                            id="birthday"
-                            name="birthday"
-                            class="form-control"
+                <div>
+                    <label for="birthday" class="form-label">Fecha de Nacimiento</label>
+                    <input type="date"
+                        id="birthday"
+                        name="birthday"
+                        class="form-control"
                             value="{{ form.instance.birthday|date:'Y-m-d' }}" 
-                            required/>
-                        
-                        {% if form.errors.birthday %}
-                            <div class="invalid-feedback">
-                                {{ form.errors.birthday }}
-                            </div>
-                        {% endif %}
-                    </div>
+                        required/>
+
+                    {% if form.errors.birthday %}
+                        <div class="invalid-feedback">
+                            {{ form.errors.birthday }}
+                        </div>
+                    {% endif %}
+                </div>
                 <button class="btn btn-primary">Guardar</button>
             </form>
         </div>

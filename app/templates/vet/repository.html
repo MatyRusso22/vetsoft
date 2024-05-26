@@ -17,6 +17,7 @@
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Teléfono</th>
+                <th>Especialidad</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -27,6 +28,7 @@
                     <td>{{vet.name}}</td>
                     <td>{{vet.email}}</td>
                     <td>{{vet.phone}}</td>
+                    <td>{{vet.speciality}}</td>
                     <td>
                         <a class="btn btn-outline-primary"
                            href="{% url 'vet_edit' id=vet.id %}"

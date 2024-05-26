@@ -6,6 +6,7 @@ from app.models import Pet
 from datetime import datetime
 
 
+from app.models import Vet , EspecialidadVeterinario
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):
@@ -182,3 +183,34 @@ class PetModelTest(TestCase):
 
         # Verificar que el número de teléfono no haya cambiado
         self.assertEqual(pet.weight, 25)
+
+
+class VetTestCase(TestCase):
+    def test_speciality_vet(self):
+        vet = Vet.objects.create(
+            name="Juan Sebastian Veron",
+            email="juan@example.com",
+            phone="1234567890",
+            speciality=EspecialidadVeterinario.CIRUGIA
+        )
+        self.assertEqual(vet.speciality, EspecialidadVeterinario.CIRUGIA)        
+
+    def test_can_create_and_get_vet(self):
+        Vet.save_vet(
+            {
+                "name": "Juan Sebastian Veron",
+                "email": "brujita75@hotmail.com",
+                "phone": "221555232",
+                "speciality": "EspecialidadVeterinario.CIRUGIA",
+            }
+        )
+        vet = Vet.objects.all()
+        self.assertEqual(len(vet), 1)
+
+        self.assertEqual(vet[0].name, "Juan Sebastian Veron")
+        self.assertEqual(vet[0].email, "brujita75@hotmail.com")
+        self.assertEqual(vet[0].phone, "221555232")
+        self.assertEqual(vet[0].speciality, "EspecialidadVeterinario.CIRUGIA")
+        
+
+      
