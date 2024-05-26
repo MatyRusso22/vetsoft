@@ -2,6 +2,11 @@ from django.test import TestCase
 from app.models import Client
 from app.models import Provider
 from app.models import Medicine
+from app.models import Product,validate_product
+from app.models import Pet
+from datetime import datetime
+
+
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):
@@ -115,8 +120,6 @@ class ProviderModelTest(TestCase):
 
 
 
-
-
 class MedicineModelTest(TestCase):
     def test_can_create_and_get_medicine_with_valid_dose(self):
         Medicine.save_medicine(
@@ -134,37 +137,88 @@ class MedicineModelTest(TestCase):
         self.assertEqual(medicines[0].dosis, 2)
 
     def test_validation_invalid_dose_cero(self):
-        Medicine.save_medicine(
+        medicine = Medicine.save_medicine(
             {
+                "name": "Paracetamol",
+                "descripcion": "Dolores de cabeza",
+                "dosis": 5,
+            }
+        )
+    
+        errors = medicine.update_medicine({
                 "name": "Paracetamol",
                 "descripcion": "Dolores de cabeza",
                 "dosis": 0,
-            }
-        )
-        medicine = Medicine.objects.get(pk=1)
+            })
+        
+        self.assertIn("dosis", errors)
+        self.assertEqual(errors["dosis"], "La dosis debe ser mayor a cero")
 
-        self.assertEqual(medicine.dosis, 0)
+    
+class ProductModelTest(TestCase):
 
-        medicine.update_medicine({"dosis": 7})
+    def test_validate_product_price(self):
+        data = {
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': -100
+        }
+        errors = validate_product(data)
+        self.assertIn('price', errors)
+        self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
 
-        medicine_updated = Medicine.objects.get(pk=1)
-
-        self.assertEqual(medicine_updated.dosis, 7)
-
-    def test_update_medicine_with_error(self):
-        Medicine.save_medicine(
+    def test_can_create_and_get_product(self):
+        Product.save_product(
             {
-                "name": "Paracetamol",
-                "descripcion": "Dolores de cabeza",
-                "dosis": 15,
+                "name": "Hueso",
+                "type": "Juguete",
+                "price": 100.0,
             }
         )
-        medicine = Medicine.objects.get(pk=1)
+        products = Product.objects.all()
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].name, "Hueso")
+        self.assertEqual(products[0].type, "Juguete")
+        self.assertEqual(products[0].price, 100.0)
 
-        self.assertEqual(medicine.dosis, 15)
+    def test_can_update_product(self):
+        Product.save_product(
+            {
+                "name": "Hueso",
+                "type": "Juguete",
+                "price": 100.0,
+            }
+        )
+        product = Product.objects.get(pk=1)
+        self.assertEqual(product.price, 100.0)
+        product.update_product( {
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': 200.0
+           } )
+        product_updated = Product.objects.get(pk=1)
+        self.assertEqual(product_updated.price, 200.0)
+      
+class PetModelTest(TestCase):
+    def test_update_pet_with_negative_weight(self):
+        # Crear una mascota
+        pet = Pet.objects.create(
+            name="Roma",
+            breed="",
+            weight=25,
+            birthday="2020-02-02",
+        )
 
-        medicine.update_medicine({"dosis": ""})
+        # Intentar actualizar con un peso negativo
+        success, errors = pet.update_pet({
+            "name": "Roma",
+            "breed": "",
+            "weight": -30,  # Peso negativo
+            "birthday": "2020-02-02",
+        })
 
-        medicine_updated = Medicine.objects.get(pk=1)
+        # Debería fallar, así que success debería ser False
+        self.assertFalse(success)
 
-        self.assertEqual(medicine_updated.dosis, 15)
+        # Verificar que el número de teléfono no haya cambiado
+        self.assertEqual(pet.weight, 25)
