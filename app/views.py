@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.urls import reverse
 from .models import Client 
 from .models import Pet
 from .forms import PetForm
@@ -61,17 +62,20 @@ def pets_repository(request):
 def pets_form(request, id=None):
     errors = {}
     pet = None
+    saved = True
 
     if request.method == "POST":
-        saved = True
-
         pet_id = request.POST.get("id") if "id" in request.POST else None
 
         if pet_id is None:
             saved, errors = Pet.save_pet(request.POST)
         else:
             pet = get_object_or_404(Pet, pk=pet_id)
-            pet.update_pet(request.POST)
+            try:
+                pet.update_pet(request.POST)
+            except ValueError as e:
+                errors["weight"] = str(e)
+                saved = False
 
         if saved:
             return redirect(reverse("pets_repo"))
@@ -174,39 +178,37 @@ def products_repository(request):
 
 
 def products_form(request, id=None):
-    errors = {}
-    product = None
-
     if request.method == "POST":
+        product_id = request.POST.get("id", "")
+        errors = {}
         saved = True
 
-        product_id = request.POST.get("id") if "id" in request.POST else None
-
-        if product_id is None:
+        if product_id == "":
             saved, errors = Product.save_product(request.POST)
         else:
             product = get_object_or_404(Product, pk=product_id)
-            product.update_product(request.POST)
+            saved, errors = product.update_product(request.POST)
 
         if saved:
             return redirect(reverse("products_repo"))
-    else:
-        if id is not None:
-            product = get_object_or_404(Product, pk=id)
 
-    form = ProductForm(request.POST or None, instance=product)
+        return render(
+            request, "products/form.html", {"errors": errors, "product": request.POST}
+        )
+    
+    product = None
+    if id is not None:
+        product = get_object_or_404(Product, pk=id)
 
-    return render(
-        request, "products/form.html", {"errors": errors, "form": form, "form_title": "Agregar Producto", "form_action": "products_form"}
-    )
- 
- 
+    return render(request, "products/form.html", {"product": product})
+
 def products_delete(request):
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, pk=int(product_id))
     product.delete()
 
     return redirect(reverse("products_repo"))
+
 def vet_repository(request):
     vet = Vet.objects.all()
     return render(request, "vet/repository.html", {"vet": vet})

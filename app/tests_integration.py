@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.shortcuts import reverse
 from app.models import Client
 from app.models import Provider
+from app.models import Pet
+from app.models import Product
 from app.models import Vet , EspecialidadVeterinario
 
 
@@ -171,6 +173,106 @@ class ProvidersTest(TestCase):
         self.assertEqual(editedProvider.address, "San Martin 212")
         self.assertEqual(editedProvider.email, provider.email)
 
+class PetsTest(TestCase):
+    def test_edit_pet_with_negative_weight(self):
+        pet = Pet.objects.create(
+            name="Roma",
+            breed="",
+            weight=25,
+            birthday="2020-02-02",
+        )
+
+        # Intento modificar que el peso sea negativo
+        response = self.client.post(
+            reverse("pets_form"),
+            data={
+                "id": pet.id,
+                "name": "Roma",
+                "breed": "",
+                "weight": -30,  # Peso negativo
+                "birthday": "2020-02-02",
+            },
+        )
+
+        # Deberia tirar error, con un codigo 302 (osea que hubo un error)
+        self.assertEqual(response.status_code, 302)
+
+        # Y no se modificaria nada
+        editedPet = Pet.objects.get(pk=pet.id)
+        self.assertEqual(editedPet.name, "Roma")
+        self.assertEqual(editedPet.breed, "")
+        self.assertEqual(editedPet.weight, 25)
+        self.assertEqual(editedPet.birthday.strftime('%Y-%m-%d'), "2020-02-02")
+
+class ProductTest(TestCase):
+ 
+    def test_form_use_form_template(self):
+        response = self.client.get(reverse("products_form"))
+        self.assertTemplateUsed(response, "products/form.html")
+
+    def test_can_create_product(self):
+        response = self.client.post(
+            reverse("products_form"),
+            data={
+                "name": "Cepillo",
+                "type": "Higiene",
+                "price": 100.0,
+            },
+        )
+        
+        products = Product.objects.all() 
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].name, "Cepillo")
+        self.assertEqual(products[0].type, "Higiene")
+        self.assertEqual(products[0].price, 100.0)
+        self.assertRedirects(response, reverse("products_repo"))
+
+    def test_validation_errors_create_product(self):
+        response = self.client.post(
+            reverse("products_form"),
+            data={},
+        )       
+        
+        self.assertContains(response, "Por favor ingrese un nombre para el producto") 
+        self.assertContains(response, "Por favor ingrese el tipo del producto")  
+        self.assertContains(response, "Por favor ingrese el precio del producto")
+
+    
+    def test_should_response_with_404_status_if_product_doesnt_exists(self):
+        response = self.client.get(reverse("products_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_validation_price_greater_than_zero(self):
+        response = self.client.post(
+            reverse("products_form"),
+            data={
+                "name": "Shampoo",
+                "type": "Higiene",
+                "price": -10.0,
+            },
+        ) 
+        self.assertContains(response, "Por favor ingrese un precio del producto mayor que cero")
+
+    def test_edit_product_with_valid_data(self):
+        product = Product.objects.create(
+            name="Shampoo",
+            type="Higiene",
+            price=100.0,
+        )
+        response = self.client.post(
+            reverse("products_form"),
+            data={
+                "id": product.id,
+                "name": "Shampoo premium",
+                "type":"Higiene",
+                "price":100.0,
+            },
+        ) 
+        self.assertEqual(response.status_code, 302)
+        edited_product = Product.objects.get(pk=product.id)
+        self.assertEqual(edited_product.name, "Shampoo premium")
+        self.assertEqual(edited_product.type, product.type)
+        self.assertEqual(edited_product.price, product.price)
 class VetTest(TestCase):
     def test_repo_use_repo_template(self):
         response = self.client.get(reverse("vet_repo"))
