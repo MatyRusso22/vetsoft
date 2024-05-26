@@ -9,6 +9,8 @@ from app.models import Client
 
 from app.models import Provider
 
+from app.models import Vet , EspecialidadVeterinario
+
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 playwright = sync_playwright().start()
 headless = os.environ.get("HEADLESS", 1) == 1
@@ -19,7 +21,7 @@ class PlaywrightTestCase(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.browser: Browser = playwright.firefox.launch(
+        cls.browser: Browser = playwright.chromium.launch(
             headless=headless, slow_mo=int(slow_mo)
         )
 
@@ -278,3 +280,22 @@ class ProvidersTestCase(PlaywrightTestCase):
             "link", name="Nuevo proveedor", exact=False
         )
         expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
+class VetTestCase(PlaywrightTestCase):
+    def test_should_show_vet_edit_action(self):
+        vet = Vet.objects.create(
+            name="Juan Sebastián Veron",
+            email="brujita75@hotmail.com",
+            phone="221555232",
+            speciality="EspecialidadVeterinario.CIRUGIA",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('vet_repo')}")
+
+        edit_action = self.page.get_by_role("link", name="Editar")
+        expect(edit_action).to_have_attribute(
+            "href", reverse("vet_edit", kwargs={"id": vet.id})
+        )
+
+
+
