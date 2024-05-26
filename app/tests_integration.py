@@ -201,105 +201,29 @@ class MedicinesTest(TestCase):
         response = self.client.get(reverse("medicines_edit", kwargs={"id": 100}))
         self.assertEqual(response.status_code, 404)
 
-    def test_validation_invalid_dosis(self):
+    def test_validation_dosis_greater_than_ten(self):
         response = self.client.post(
             reverse("medicines_form"),
             data={
-                "name": "Ibuprofeno",
+                "name": "Paracetamol",
                 "descripcion": "Dolores de cabeza",
-                "dosis": "11",
+                "dosis": 11,
             },
-        )
-
-        self.assertEqual(response.status_code, 302)
-
-    def test_edit_medicine_with_invalid_dosis(self):
-        medicine = Medicine.objects.create(
-            name="Ibuprofeno",
-            descripcion="Dolores de cabeza",
-            dosis= 5,
-        )
-
+        ) 
+        self.assertContains(response, "La dosis debe ser menor que 10")
+    
+    def test_validation_dosis_smaller_than_one(self):
         response = self.client.post(
             reverse("medicines_form"),
             data={
-                "id": medicine.id,
-                "name": "Ibuprofeno",
-                "descripcion":"Dolores de cabeza",
-                "dosis": 15,
-            },
-        )
-
-        self.assertEqual(response.status_code, 302)
-
-        editedMedicine = Medicine.objects.get(pk=medicine.id)
-        self.assertEqual(editedMedicine.name, "Ibuprofeno")
-        self.assertEqual(editedMedicine.descripcion, "Dolores de cabeza")
-        self.assertEqual(editedMedicine.dosis, 15)
-
-class MedicinesTest(TestCase):
-
-    def test_form_use_medicine_form_template(self):
-        response = self.client.get(reverse("medicines_form"))
-        self.assertTemplateUsed(response, "medicines/form.html")
-
-    def test_can_create_medicine(self):
-        response = self.client.post(
-            reverse("medicines_form"),
-            data={
-                "name": "Ibuprofeno",
+                "name": "Paracetamol",
                 "descripcion": "Dolores de cabeza",
-                "dosis": 2,
+                "dosis": 0,
             },
-        )
-        medicines = Medicine.objects.all()
-        self.assertEqual(len(medicines), 1)
+        ) 
+        self.assertContains(response, "La dosis debe ser mayor a cero")
 
-        self.assertEqual(medicines[0].name, "Ibuprofeno")
-        self.assertEqual(medicines[0].descripcion, "Dolores de cabeza")
-        self.assertEqual(medicines[0].dosis, 2)
-
-        self.assertRedirects(response, reverse("medicines_repo"))
-
-    def test_should_response_with_404_status_if_medicine_doesnt_exists(self):
-        response = self.client.get(reverse("medicines_edit", kwargs={"id": 100}))
-        self.assertEqual(response.status_code, 404)
-
-    def test_validation_invalid_dosis(self):
-        response = self.client.post(
-            reverse("medicines_form"),
-            data={
-                "name": "Ibuprofeno",
-                "descripcion": "Dolores de cabeza",
-                "dosis": "11",
-            },
-        )
-
-        self.assertEqual(response.status_code, 302)
-
-    def test_edit_medicine_with_invalid_dosis(self):
-        medicine = Medicine.objects.create(
-            name="Ibuprofeno",
-            descripcion="Dolores de cabeza",
-            dosis= 5,
-        )
-
-        response = self.client.post(
-            reverse("medicines_form"),
-            data={
-                "id": medicine.id,
-                "name": "Ibuprofeno",
-                "descripcion":"Dolores de cabeza",
-                "dosis": 15,
-            },
-        )
-
-        self.assertEqual(response.status_code, 302)
-
-        editedMedicine = Medicine.objects.get(pk=medicine.id)
-        self.assertEqual(editedMedicine.name, "Ibuprofeno")
-        self.assertEqual(editedMedicine.descripcion, "Dolores de cabeza")
-        self.assertEqual(editedMedicine.dosis, 15)
+    
 
 class PetsTest(TestCase):
     def test_edit_pet_with_negative_weight(self):
