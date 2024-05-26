@@ -66,6 +66,21 @@
                     {% endif %}
                 </div>
                 
+                <div>
+                    <label for="speciality" class="form-label">Especialidad</label>
+                    <input type="text"
+                        id="speciality"
+                        name="speciality"
+                        class="form-control"
+                        value="{{vet.speciality}}"
+                        required/>
+
+                    {% if errors.speciality %}
+                        <div class="invalid-feedback">
+                            {{ errors.speciality }}
+                        </div>
+                    {% endif %}
+                </div>
                 
                 <button class="btn btn-primary">Guardar</button>
             </form>

@@ -12,6 +12,8 @@ from app.models import Provider
 from app.models import Pet
 from app.models import Product
 
+from app.models import Vet , EspecialidadVeterinario
+
 from app.models import Medicine
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
@@ -24,7 +26,7 @@ class PlaywrightTestCase(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.browser: Browser = playwright.firefox.launch(
+        cls.browser: Browser = playwright.chromium.launch(
             headless=headless, slow_mo=int(slow_mo)
         )
 
@@ -274,7 +276,6 @@ class ProvidersTestCase(PlaywrightTestCase):
             "link", name="Nuevo proveedor", exact=False
         )
         expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
-
 
 class MedicinesTestCase(PlaywrightTestCase):
     def test_should_show_medicines_data(self):
