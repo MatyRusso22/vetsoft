@@ -74,8 +74,10 @@ def validate_medicine(data):
             dosis = float(dosis)
             if dosis <= 0:
                 errors['dosis'] = "La dosis debe ser mayor a cero"
-            elif not (1 <= dosis <= 10):
-                errors["dosis"] = "La dosis debe estar entre 1 y 10"
+            elif dosis  < 1:
+                errors["dosis"] = "La dosis debe ser mayor o igual que 1"
+            elif dosis > 10:
+                errors["dosis"] = "La dosis debe ser menor que 10"
         except ValueError:
             errors["dosis"] = "La cantidad de dosis no es correcta"
     return errors
@@ -273,7 +275,6 @@ class Medicine(models.Model):
         self.name = medicine_data.get("name", "") or self.name
         self.descripcion = medicine_data.get("descripcion", "") or self.descripcion
         self.dosis = medicine_data.get("dosis", "") or self.dosis
-
         self.save()
     
         return True, None
