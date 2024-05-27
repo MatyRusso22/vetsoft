@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.shortcuts import reverse
 from app.models import Client
 from app.models import Provider
+from app.models import Medicine
 from app.models import Pet
 from app.models import Product
 from app.models import Vet , EspecialidadVeterinario
@@ -14,6 +15,7 @@ class HomePageTest(TestCase):
 
 
 class ClientsTest(TestCase):
+
     def test_repo_use_repo_template(self):
         response = self.client.get(reverse("clients_repo"))
         self.assertTemplateUsed(response, "clients/repository.html")
@@ -99,7 +101,6 @@ class ClientsTest(TestCase):
         self.assertEqual(editedClient.email, client.email)
 
 
-
 class ProvidersTest(TestCase):
 
     def test_form_use_provider_form_template(self):
@@ -172,6 +173,58 @@ class ProvidersTest(TestCase):
         self.assertEqual(editedProvider.name, "Carlos Tevez")
         self.assertEqual(editedProvider.address, "San Martin 212")
         self.assertEqual(editedProvider.email, provider.email)
+
+class MedicinesTest(TestCase):
+
+    def test_form_use_medicine_form_template(self):
+        response = self.client.get(reverse("medicines_form"))
+        self.assertTemplateUsed(response, "medicines/form.html")
+
+    def test_can_create_medicine(self):
+        response = self.client.post(
+            reverse("medicines_form"),
+            data={
+                "name": "Ibuprofeno",
+                "descripcion": "Dolores de cabeza",
+                "dosis": 2,
+            },
+        )
+        medicines = Medicine.objects.all()
+        self.assertEqual(len(medicines), 1)
+
+        self.assertEqual(medicines[0].name, "Ibuprofeno")
+        self.assertEqual(medicines[0].descripcion, "Dolores de cabeza")
+        self.assertEqual(medicines[0].dosis, 2)
+
+        self.assertRedirects(response, reverse("medicines_repo"))
+
+    def test_should_response_with_404_status_if_medicine_doesnt_exists(self):
+        response = self.client.get(reverse("medicines_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_validation_dosis_greater_than_ten(self):
+        response = self.client.post(
+            reverse("medicines_form"),
+            data={
+                "name": "Paracetamol",
+                "descripcion": "Dolores de cabeza",
+                "dosis": 11,
+            },
+        ) 
+        self.assertContains(response, "La dosis debe ser menor que 10")
+    
+    def test_validation_dosis_smaller_than_one(self):
+        response = self.client.post(
+            reverse("medicines_form"),
+            data={
+                "name": "Paracetamol",
+                "descripcion": "Dolores de cabeza",
+                "dosis": 0,
+            },
+        ) 
+        self.assertContains(response, "La dosis debe ser mayor a cero")
+
+    
 
 class PetsTest(TestCase):
     def test_edit_pet_with_negative_weight(self):
