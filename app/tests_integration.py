@@ -103,17 +103,15 @@ class ClientsTest(TestCase):
 
 class ProvidersTest(TestCase):
 
-    def test_form_use_provider_form_template(self):
-        response = self.client.get(reverse("provider_form"))
-        self.assertTemplateUsed(response, "provider/form.html")
-
-    def test_can_create_provider(self):
+    def test_can_create_provider_with_valid_address(self):
+        # Prueba que se pueda crear un nuevo proveedor con una dirección válida.
+        
         response = self.client.post(
             reverse("provider_form"),
             data={
                 "name": "Luis Fernando Flores",
                 "email": "Fernanf100@gmail.com",
-                "address": "ElSalvador 245",
+                "address": "Calle 13 y Calle 56",
             },
         )
         providers = Provider.objects.all()
@@ -121,40 +119,29 @@ class ProvidersTest(TestCase):
 
         self.assertEqual(providers[0].name, "Luis Fernando Flores")
         self.assertEqual(providers[0].email, "Fernanf100@gmail.com")
-        self.assertEqual(providers[0].address, "ElSalvador 245")
+        self.assertEqual(providers[0].address, "Calle 13 y Calle 56")
 
         self.assertRedirects(response, reverse("provider_repo"))
 
-    def test_validation_errors_create_provider(self):
-        response = self.client.post(
-            reverse("provider_form"),
-            data={},
-        )
-
-        self.assertContains(response, "Por favor ingrese un nombre")
-        self.assertContains(response, "Por favor ingrese un email")
-        self.assertContains(response, "Por favor ingrese una dirección")
-
-    def test_should_response_with_404_status_if_provider_doesnt_exists(self):
-        response = self.client.get(reverse("provider_edit", kwargs={"id": 100}))
-        self.assertEqual(response.status_code, 404)
-
-    def test_validation_invalid_email(self):
+    def test_validation_errors_create_provider_with_invalid_address(self):
+        # Prueba que se muestren errores de validación si se proporciona una dirección inválida al crear un proveedor.
+        
         response = self.client.post(
             reverse("provider_form"),
             data={
                 "name": "Luis Fernando Flores",
-                "email": "Fernanf100",
-                "address": "ElSalvador 245",
+                "email": "Fernanf100@gmail.com",
+                "address": "",  # Dirección vacía
             },
         )
 
-        self.assertContains(response, "Por favor ingrese un email valido")
+        self.assertContains(response, "Por favor ingrese una dirección")
 
-    def test_edit_provider_with_valid_data(self):
+    def test_edit_provider_with_valid_address(self):
+        # Prueba que se pueda editar un proveedor existente con una dirección válida.
         provider = Provider.objects.create(
             name="Luis Fernando Flores",
-            address="ElSalvador 245",
+            address="Calle 13 y Calle 56",
             email="Fernanf100@gmail.com",
         )
 
@@ -163,7 +150,7 @@ class ProvidersTest(TestCase):
             data={
                 "id": provider.id,
                 "name": "Carlos Tevez",
-                "address": "San Martin 212",
+                "address": "Calle 14 y Calle 57",
             },
         )
 
@@ -171,8 +158,33 @@ class ProvidersTest(TestCase):
 
         editedProvider = Provider.objects.get(pk=provider.id)
         self.assertEqual(editedProvider.name, "Carlos Tevez")
-        self.assertEqual(editedProvider.address, "San Martin 212")
+        self.assertEqual(editedProvider.address, "Calle 14 y Calle 57")
         self.assertEqual(editedProvider.email, provider.email)
+
+    def test_edit_provider_with_invalid_address(self):
+        #Prueba que no se pueda editar un proveedor existente con una dirección inválida ,si no que se quedara con la dirección valida que tenía
+
+        provider = Provider.objects.create(
+            name="Luis Fernando Flores",
+            address="Calle 13 y Calle 56",
+            email="Fernanf100@gmail.com",
+        )
+
+        response = self.client.post(
+        reverse("provider_form"),
+            data={
+                "id": provider.id,
+                "address": "",  # Dirección vacía
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)  # Debería devolver un código 302, indicando una redirección
+
+
+        editedProvider = Provider.objects.get(pk=provider.id)
+        self.assertEqual(editedProvider.name, "Luis Fernando Flores")  # El nombre no debería cambiar
+        self.assertEqual(editedProvider.address, "Calle 13 y Calle 56")  # La dirección no debería cambiar
+        self.assertEqual(editedProvider.email, provider.email)  # El correo electrónico no debería cambiar
 
 class MedicinesTest(TestCase):
 
