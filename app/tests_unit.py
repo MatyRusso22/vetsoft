@@ -66,7 +66,7 @@ class ClientModelTest(TestCase):
         self.assertEqual(client_updated.phone, "221555232")
 
 class ProviderModelTest(TestCase):
-    def test_can_create_and_get_provider(self):
+    def test_can_create_and_get_provider_with_address(self):
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -81,7 +81,7 @@ class ProviderModelTest(TestCase):
         self.assertEqual(providers[0].email, "Fernanf100@gmail.com")
         self.assertEqual(providers[0].address, "ElSalvador 245")
 
-    def test_can_update_provider(self):
+    def test_can_update_provider_address(self):
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -99,7 +99,7 @@ class ProviderModelTest(TestCase):
 
         self.assertEqual(provider_updated.address, "SanMartin 212")
 
-    def test_update_provider_with_error(self):
+    def test_update_provider_address_with_error(self):
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
