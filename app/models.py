@@ -249,7 +249,7 @@ class Pet(models.Model):
 class Medicine(models.Model):
     name = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=100, blank=True)
-    dosis = models.IntegerField()
+    dosis = models.FloatField()
 
     def __str__(self):
         return self.name
