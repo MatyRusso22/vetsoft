@@ -18,8 +18,8 @@
 
                 {% csrf_token %}
 
-                {% if form.instance.id %}
-                    <input type="hidden" value="{{ form.instance.id }}" name="id" />
+                {% if instance.id %}
+                    <input type="hidden" value="{{ instance.id }}" name="id" />
                 {% endif %}
 
                 <div>
@@ -27,13 +27,13 @@
                     <input type="text"
                         id="name"
                         name="name"
-                        value="{{ form.instance.name }}"
+                        value="{{ instance.name }}"
                         class="form-control"
                         required/>
 
-                    {% if form.errors.name %}
+                    {% if errors.name %}
                         <div class="invalid-feedback">
-                            {{ form.errors.name }}
+                            {{ errors.name }}
                         </div>
                     {% endif %}
                 </div>
@@ -64,12 +64,12 @@
                             id="birthday"
                             name="birthday"
                             class="form-control"
-                            value="{{ form.instance.birthday|date:'Y-m-d' }}" 
+                            value="{{ instance.birthday|date:'Y-m-d' }}" 
                             required/>
                         
-                        {% if form.errors.birthday %}
+                        {% if errors.birthday %}
                             <div class="invalid-feedback">
-                                {{ form.errors.birthday }}
+                                {{ errors.birthday }}
                             </div>
                         {% endif %}
                     </div>
