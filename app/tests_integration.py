@@ -306,6 +306,32 @@ class ProductTest(TestCase):
         ) 
         self.assertContains(response, "Por favor ingrese un precio del producto mayor que cero")
 
+    def test_validation_price_zero(self):
+        response = self.client.post(
+            reverse("products_form"),
+            data={
+                "name": "Shampoo",
+                "type": "Higiene",
+                "price": 0,
+            },
+        ) 
+        self.assertContains(response, "Por favor ingrese un precio del producto mayor que cero")
+
+    def test_validation_price_non_numeric(self):
+        response = self.client.post(
+            reverse("products_form"),
+            data={
+                "name": "Shampoo",
+                "type": "Higiene",
+                "price": "abc",
+            },
+        ) 
+        self.assertContains(response, "Por favor ingrese un precio valido para el producto")
+
+    def test_should_response_with_404_status_if_product_doesnt_exists(self):
+        response = self.client.get(reverse("products_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+
     def test_edit_product_with_valid_data(self):
         product = Product.objects.create(
             name="Shampoo",
@@ -317,15 +343,49 @@ class ProductTest(TestCase):
             data={
                 "id": product.id,
                 "name": "Shampoo premium",
-                "type":"Higiene",
-                "price":100.0,
+                "type": "Higiene",
+                "price": 200.0,
             },
         ) 
         self.assertEqual(response.status_code, 302)
         edited_product = Product.objects.get(pk=product.id)
         self.assertEqual(edited_product.name, "Shampoo premium")
         self.assertEqual(edited_product.type, product.type)
-        self.assertEqual(edited_product.price, product.price)
+        self.assertEqual(edited_product.price, 200.0)
+        
+    def test_validation_price_greater_than_zero_on_edit(self):
+        product = Product.objects.create(
+            name="Shampoo",
+            type="Higiene",
+            price=100.0,
+        )
+        response = self.client.post(
+            reverse("products_edit", kwargs={"id": product.id}),
+            data={
+                "name": "Shampoo",
+                "type": "Higiene",
+                "price": -10.0,
+            },
+        )
+        self.assertContains(response, "Por favor ingrese un precio del producto mayor que cero")
+
+    def test_validation_price_zero_on_edit(self):
+        product = Product.objects.create(
+            name="Shampoo",
+            type="Higiene",
+            price=100.0,
+        )
+        response = self.client.post(
+            reverse("products_edit", kwargs={"id": product.id}),
+            data={
+                "name": "Shampoo",
+                "type": "Higiene",
+                "price": 0,
+            },
+        )
+        self.assertContains(response, "Por favor ingrese un precio del producto mayor que cero")
+
+
 class VetTest(TestCase):
     def test_repo_use_repo_template(self):
         response = self.client.get(reverse("vet_repo"))
