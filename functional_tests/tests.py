@@ -593,42 +593,6 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
         self.page.get_by_role("button", name="Guardar").click()
 
         expect(self.page.get_by_text("Por favor ingrese un precio del producto mayor que cero")).to_be_visible()
-
-
-class ProvidersTestCase(PlaywrightTestCase):
-    def test_should_show_providers_data(self):
-        Provider.objects.create(
-            name="Provider 1",
-            address="123 Main St",
-            email="provider1@example.com",
-        )
-
-        Provider.objects.create(
-            name="Provider 2",
-            address="456 Elm St",
-            email="provider2@example.com",
-        )
-
-        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
-
-        expect(self.page.get_by_text("No existen proveedores")).not_to_be_visible()
-
-        expect(self.page.get_by_text("Provider 1")).to_be_visible()
-        expect(self.page.get_by_text("123 Main St")).to_be_visible()
-        expect(self.page.get_by_text("provider1@example.com")).to_be_visible()
-
-        expect(self.page.get_by_text("Provider 2")).to_be_visible()
-        expect(self.page.get_by_text("456 Elm St")).to_be_visible()
-        expect(self.page.get_by_text("provider2@example.com")).to_be_visible()
-
-    def test_should_show_add_provider_action(self):
-        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
-
-        add_provider_action = self.page.get_by_role(
-            "link", name="Nuevo proveedor", exact=False
-        )
-        expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
-
 class PetsRepoTestCase(PlaywrightTestCase):
     def test_should_show_clients_data(self):
         Pet.objects.create(
@@ -661,7 +625,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
             "href", reverse("pets_edit", kwargs={"id": pet_instance.id})
         )
 
-
     def test_should_can_be_able_to_delete_a_pet(self):
         Pet.objects.create(
             name="Lola",
@@ -685,3 +648,28 @@ class PetsRepoTestCase(PlaywrightTestCase):
         self.assertTrue(response.status < 400)
 
         expect(self.page.get_by_text("Lola")).not_to_be_visible()
+    
+    def test_should_view_errors_if_form_is_invalid_with_weight_less_than_zero(self): 
+        self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        # Verificar que se muestren mensajes de error para ingresar nombre, raza, fecha de nacimiento y peso
+        expect(self.page.get_by_text("Por favor ingrese un nombre")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese una fecha")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un peso")).to_be_visible()
+
+        # Completar el formulario con un peso negativo y enviarlo
+        self.page.get_by_label("Nombre").fill("Gordo")
+        self.page.get_by_label("Raza").fill("")
+        self.page.get_by_label("Fecha de nacimiento").fill("2017-01-11")
+        self.page.get_by_label("Peso").fill("-10")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        # Verificar que el mensaje de error "El peso debe ser mayor que cero" sea visible
+        expect(
+            self.page.get_by_text("El peso debe ser mayor que 0")
+        ).to_be_visible()

@@ -4,6 +4,7 @@ from app.models import Client
 from app.models import Provider
 from app.models import Medicine
 from app.models import Pet
+from datetime import date
 from app.models import Product
 from app.models import Vet , EspecialidadVeterinario
 
@@ -239,35 +240,57 @@ class MedicinesTest(TestCase):
     
 
 class PetsTest(TestCase):
-    def test_edit_pet_with_negative_weight(self):
-        pet = Pet.objects.create(
-            name="Roma",
-            breed="",
-            weight=25,
-            birthday="2020-02-02",
-        )
+    def test_form_use_pet_form_template(self):
+        response = self.client.get(reverse("pets_form"))
+        self.assertTemplateUsed(response, "pets/form.html")
 
-        # Intento modificar que el peso sea negativo
+    def test_can_create_pets(self):
         response = self.client.post(
             reverse("pets_form"),
             data={
-                "id": pet.id,
-                "name": "Roma",
+                "name": "Micho",
                 "breed": "",
-                "weight": -30,  # Peso negativo
-                "birthday": "2020-02-02",
+                "weight": 2,
+                "birthday": "2024-04-04"
             },
         )
+        pet = Pet.objects.all()
+        self.assertEqual(len(pet), 1)
 
-        # Deberia tirar error, con un codigo 302 (osea que hubo un error)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(pet[0].name, "Micho")
+        self.assertEqual(pet[0].breed, "")
+        self.assertEqual(pet[0].weight, 2)
+        self.assertEqual(pet[0].birthday, date(2024, 4, 4))
 
-        # Y no se modificaria nada
-        editedPet = Pet.objects.get(pk=pet.id)
-        self.assertEqual(editedPet.name, "Roma")
-        self.assertEqual(editedPet.breed, "")
-        self.assertEqual(editedPet.weight, 25)
-        self.assertEqual(editedPet.birthday.strftime('%Y-%m-%d'), "2020-02-02")
+        self.assertRedirects(response, reverse("pets_repo"))
+
+    def test_should_response_with_404_status_if_pet_doesnt_exists(self):
+        response = self.client.get(reverse("pets_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+    
+    def test_validation_weight_cant_be_cero(self):
+        response = self.client.post(
+            reverse("pets_form"),
+            data={
+                "name": "Tito",
+                "breed": "",
+                "weight": 0,
+                "birthday": "2024-04-04"
+            },
+        ) 
+        self.assertContains(response, "El peso debe ser mayor que 0")
+    
+    def test_validation_weight_cant_be_negative(self):
+        response = self.client.post(
+            reverse("pets_form"),
+            data={
+                "name": "Negro",
+                "breed": "",
+                "weight": -1,
+                "birthday": "2024-04-04"
+            },
+        ) 
+        self.assertContains(response, "El peso debe ser mayor que 0")
 
 class ProductTest(TestCase):
  

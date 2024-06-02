@@ -192,28 +192,25 @@ class ProductModelTest(TestCase):
 
 
 class PetModelTest(TestCase):
-    def test_update_pet_with_negative_weight(self):
-        # Crear una mascota
-        pet = Pet.objects.create(
-            name="Roma",
-            breed="",
-            weight=25,
-            birthday="2020-02-02",
-        )
-
-        # Intentar actualizar con un peso negativo
-        success, errors = pet.update_pet({
-            "name": "Roma",
-            "breed": "",
-            "weight": -30,  # Peso negativo
-            "birthday": "2020-02-02",
+    def test_invalid_weight(self):
+        result, errors = Pet.save_pet({
+            "name": "Mascota Invalida",
+            "breed": "no pasa",
+            "weight": -5.0, #peso negativo, deberia no dejar guardar
+            "birthday": "2024-02-11",
         })
+        self.assertEqual(result, False)
+        self.assertDictEqual(errors, {'weight': 'El peso debe ser mayor que 0'})
 
-        # Debería fallar, así que success debería ser False
-        self.assertFalse(success)
-
-        # Verificar que el número de teléfono no haya cambiado
-        self.assertEqual(pet.weight, 25)
+    def test_valid_weight(self):
+        result, errors = Pet.save_pet({
+            "name": "Mascota Valida",
+            "breed": "pasa",
+            "weight": 5.0, #peso valido, deberia guardarse la mascota
+            "birthday": "2024-02-11",
+        })
+        self.assertEqual(result, True)
+        self.assertIsNone(errors)
 
 
 class VetTestCase(TestCase):
