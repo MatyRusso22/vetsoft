@@ -23,37 +23,6 @@ def validate_client(data):
 
     return errors
 
-def validate_pet(data):
-    errors = {}
-
-    name = data.get("name", "")
-    breed = data.get("breed", "")
-    weight = data.get("weight", "")
-    birthday = data.get("birthday", "")
-
-    if name == "":
-        errors["name"] = "Por favor ingrese un nombre para la mascota"
-
-    if birthday == "":
-        errors["birthday"] = "Por favor ingrese la fecha de nacimiento de la mascota"
-    else:
-        try:
-            if "-" in birthday:
-                datetime.strptime(birthday, "%Y-%m-%d")
-            else:
-                datetime.strptime(birthday, "%d-%m-%Y")
-        except ValueError:
-            errors["birthday"] = "El formato de la fecha debe ser YYYY-MM-DD o DD-MM-YYYY"
-
-    if weight == "":
-        errors["weight"] = "Por favor ingrese el peso de la mascota"
-    elif not str(weight).replace('.', '', 1).isdigit():  # Asegurarse de que el peso sea un número válido
-        errors["weight"] = "El peso debe ser un número válido"
-    elif float(weight) < 0:  # Validar que el peso no sea menor a 0
-        errors["weight"] = "El peso no puede ser menor a 0"
-
-    return errors
-
 def validate_medicine(data):
     errors = {}
 
