@@ -371,3 +371,28 @@ class PetsRepoTestCase(PlaywrightTestCase):
         self.assertTrue(response.status < 400)
 
         expect(self.page.get_by_text("Lola")).not_to_be_visible()
+    
+    def test_should_view_errors_if_form_is_invalid_with_weight_less_than_zero(self): 
+        self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        # Verificar que se muestren mensajes de error para ingresar nombre, raza, fecha de nacimiento y peso
+        expect(self.page.get_by_text("Por favor ingrese un nombre")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese una fecha")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un peso")).to_be_visible()
+
+        # Completar el formulario con un peso negativo y enviarlo
+        self.page.get_by_label("Nombre").fill("Gordo")
+        self.page.get_by_label("Raza").fill("")
+        self.page.get_by_label("Fecha de nacimiento").fill("2017-01-11")
+        self.page.get_by_label("Peso").fill("-10")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        # Verificar que el mensaje de error "El peso debe ser mayor que cero" sea visible
+        expect(
+            self.page.get_by_text("El peso debe ser mayor que 0")
+        ).to_be_visible()
