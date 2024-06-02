@@ -257,6 +257,7 @@ class PetsTest(TestCase):
         self.assertEqual(editedPet.weight, 25)
         self.assertEqual(editedPet.birthday.strftime('%Y-%m-%d'), "2020-02-02")
 
+ 
 class ProductTest(TestCase):
  
     def test_form_use_form_template(self):
