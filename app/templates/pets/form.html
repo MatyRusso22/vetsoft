@@ -44,21 +44,21 @@
                         name="breed"
                         class="form-control"
                         value="{{ form.instance.breed }}"/>
-                </div>
-                <label for="weight" class="form-label">Peso</label>
-                    <input type="number"
-                        id="weight"
-                        name="weight"
-                        value="{{ form.instance.weight }}"
-                        class="form-control"
-                        required/>
-
-                    {% if form.errors.weight %}
-                        <div class="invalid-feedback">
-                            {{ form.errors.weight }}
-                        </div>
-                    {% endif %}
                     <div>
+                        <label for="weight" class="form-label">Peso</label>
+                        <input type="number"
+                            id="weight"
+                            name="weight"
+                            step="0.1"
+                            class="form-control {% if errors.weight %}is-invalid{% endif %}"
+                            value="{{ pet.weight }}"
+                            required/>
+                        {% if errors.weight %}
+                            <div class="invalid-feedback">
+                                {{ errors.weight }}
+                            </div>
+                        {% endif %}
+                    </div>
                         <label for="birthday" class="form-label">Fecha de Nacimiento</label>
                         <input type="date" 
                             id="birthday"
