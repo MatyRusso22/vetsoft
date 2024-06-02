@@ -246,28 +246,28 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
 class ProvidersTestCase(PlaywrightTestCase):
     def test_should_show_providers_data(self):
         Provider.objects.create(
-            name="Provider 1",
-            address="123 Main St",
-            email="provider1@example.com",
+            name="Proveedor 1",
+            address="Calle 7 # 1234",
+            email="proveedor1@gmail.com",
         )
 
         Provider.objects.create(
-            name="Provider 2",
-            address="456 Elm St",
-            email="provider2@example.com",
+            name="Proveedor 2",
+            address="Calle 54 # 456",
+            email="proveedor2@gmail.com",
         )
 
         self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
 
         expect(self.page.get_by_text("No existen proveedores")).not_to_be_visible()
 
-        expect(self.page.get_by_text("Provider 1")).to_be_visible()
-        expect(self.page.get_by_text("123 Main St")).to_be_visible()
-        expect(self.page.get_by_text("provider1@example.com")).to_be_visible()
+        expect(self.page.get_by_text("Proveedor 1")).to_be_visible()
+        expect(self.page.get_by_text("Calle 7 # 1234")).to_be_visible()
+        expect(self.page.get_by_text("proveedor1@gmail.com")).to_be_visible()
 
-        expect(self.page.get_by_text("Provider 2")).to_be_visible()
-        expect(self.page.get_by_text("456 Elm St")).to_be_visible()
-        expect(self.page.get_by_text("provider2@example.com")).to_be_visible()
+        expect(self.page.get_by_text("Proveedor 2")).to_be_visible()
+        expect(self.page.get_by_text("Calle 54 # 456")).to_be_visible()
+        expect(self.page.get_by_text("proveedor2@gmail.com")).to_be_visible()
 
     def test_should_show_add_provider_action(self):
         self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
@@ -276,6 +276,45 @@ class ProvidersTestCase(PlaywrightTestCase):
             "link", name="Nuevo proveedor", exact=False
         )
         expect(add_provider_action).to_have_attribute("href", reverse("provider_form"))
+
+    def test_should_show_provider_address(self):
+        Provider.objects.create(
+            name="Proveedor con Dirección",
+            address="Avenida 44 # 987",
+            email="proveedor3@gmail.com",
+        )
+
+        self.page.goto(f"{self.live_server_url}{reverse('provider_repo')}")
+
+        expect(self.page.get_by_text("Proveedor con Dirección")).to_be_visible()
+        expect(self.page.get_by_text("Avenida 44 # 987")).to_be_visible()
+
+    def test_should_be_able_to_create_provider_with_address(self):
+        self.page.goto(f"{self.live_server_url}{reverse('provider_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Nuevo Proveedor")
+        self.page.get_by_label("Dirección").fill("Calle 10 # 567")
+        self.page.get_by_label("Email").fill("nuevoproveedor@gmail.com")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Nuevo Proveedor")).to_be_visible()
+        expect(self.page.get_by_text("Calle 10 # 567")).to_be_visible()
+
+    def test_should_view_error_if_address_is_not_provided_when_creating_provider(self):
+        self.page.goto(f"{self.live_server_url}{reverse('provider_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Nuevo Proveedor")
+        self.page.get_by_label("Email").fill("nuevoproveedor@gmail.com")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor ingrese una dirección para el proveedor")).to_be_visible()
+
 
 class VetTestCase(PlaywrightTestCase):
     def test_should_show_vet_edit_action(self):
