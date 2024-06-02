@@ -101,15 +101,14 @@ def medicines_repository(request):
     return render(request, "medicines/repository.html", {"medicines": medicine})
 
 def medicines_form(request, id=None):
-    errors = {}
-    medicine = None
-
     if request.method == "POST":
         saved = True
+        errors = {}
+        medicine = None
+        medicine_id = request.POST.get("id", "") 
+        
 
-        medicine_id = request.POST.get("id") if "id" in request.POST else None
-
-        if medicine_id is None:
+        if medicine_id == "":
             saved, errors = Medicine.save_medicine(request.POST)
         else:
             medicine = get_object_or_404(Medicine, pk=medicine_id)
@@ -117,15 +116,14 @@ def medicines_form(request, id=None):
 
         if saved:
             return redirect(reverse("medicines_repo"))
-    else:
-        if id is not None:
-            medicine = get_object_or_404(Medicine, pk=id)
 
-    form = MedicineForm(request.POST or None, instance=medicine)
-
-    return render(
-        request, "medicines/form.html", {"errors": errors, "form": form, "form_title": "Agregar Medicamento", "form_action": "medicines_form"}
-    )
+        return render (request, "medicines/form.html", {"errors": errors, "medicines": request.POST})
+    
+    medicine=None
+    if id is not None: 
+        medicine=get_object_or_404(Medicine, pk=id)
+        
+    return render (request, "medicines/form.html", { "medicines": medicine})
 
 
 def medicines_delete(request):
@@ -178,39 +176,37 @@ def products_repository(request):
 
 
 def products_form(request, id=None):
-    errors = {}
-    product = None
-
     if request.method == "POST":
+        product_id = request.POST.get("id", "")
+        errors = {}
         saved = True
 
-        product_id = request.POST.get("id") if "id" in request.POST else None
-
-        if product_id is None:
+        if product_id == "":
             saved, errors = Product.save_product(request.POST)
         else:
             product = get_object_or_404(Product, pk=product_id)
-            product.update_product(request.POST)
+            saved, errors = product.update_product(request.POST)
 
         if saved:
             return redirect(reverse("products_repo"))
-    else:
-        if id is not None:
-            product = get_object_or_404(Product, pk=id)
 
-    form = ProductForm(request.POST or None, instance=product)
+        return render(
+            request, "products/form.html", {"errors": errors, "product": request.POST}
+        )
+    
+    product = None
+    if id is not None:
+        product = get_object_or_404(Product, pk=id)
 
-    return render(
-        request, "products/form.html", {"errors": errors, "form": form, "form_title": "Agregar Producto", "form_action": "products_form"}
-    )
- 
- 
+    return render(request, "products/form.html", {"product": product})
+
 def products_delete(request):
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, pk=int(product_id))
     product.delete()
 
     return redirect(reverse("products_repo"))
+
 def vet_repository(request):
     vet = Vet.objects.all()
     return render(request, "vet/repository.html", {"vet": vet})

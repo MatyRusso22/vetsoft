@@ -29,4 +29,4 @@ class ProductForm(forms.ModelForm):
 class VetForm(forms.ModelForm):
     class Meta:
         model = Vet
-        fields = ['name', 'email', 'phone']
+        fields = ['name', 'email', 'phone', 'speciality']

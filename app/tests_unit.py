@@ -1,10 +1,13 @@
 from django.test import TestCase
-from app.models import Client
+from app.models import Client, validate_medicine
 from app.models import Provider
+from app.models import Medicine
+from app.models import Product,validate_product
 from app.models import Pet
 from datetime import datetime
 
 
+from app.models import Vet , EspecialidadVeterinario
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):
@@ -63,7 +66,7 @@ class ClientModelTest(TestCase):
         self.assertEqual(client_updated.phone, "221555232")
 
 class ProviderModelTest(TestCase):
-    def test_can_create_and_get_provider(self):
+    def test_can_create_and_get_provider_with_address(self):
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -78,7 +81,7 @@ class ProviderModelTest(TestCase):
         self.assertEqual(providers[0].email, "Fernanf100@gmail.com")
         self.assertEqual(providers[0].address, "ElSalvador 245")
 
-    def test_can_update_provider(self):
+    def test_can_update_provider_address(self):
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -96,7 +99,7 @@ class ProviderModelTest(TestCase):
 
         self.assertEqual(provider_updated.address, "SanMartin 212")
 
-    def test_update_provider_with_error(self):
+    def test_update_provider_address_with_error(self):
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -112,8 +115,82 @@ class ProviderModelTest(TestCase):
 
         provider_updated = Provider.objects.get(pk=1)
 
-        self.assertEqual(provider_updated.address, "ElSalvador 245") 
-        
+        self.assertEqual(provider_updated.address, "ElSalvador 245")
+
+
+
+class MedicineModelTest(TestCase):
+    def test_can_create_and_get_medicine_with_valid_dose(self):
+        Medicine.save_medicine(
+            {
+                "name": "Ibuprofeno",
+                "descripcion": "Dolores de cabeza",
+                "dosis": 2,
+            }
+        )
+        medicines = Medicine.objects.all()
+        self.assertEqual(len(medicines), 1)
+
+        self.assertEqual(medicines[0].name, "Ibuprofeno")
+        self.assertEqual(medicines[0].descripcion, "Dolores de cabeza")
+        self.assertEqual(medicines[0].dosis, 2)
+
+    def test_validate_product_dosis(self):
+        data = {
+            'name': 'Paracetamol',
+            'descripcion': 'Dolores de cabeza',
+            'dosis': -100
+        }
+        errors = validate_medicine(data)
+        self.assertIn('dosis', errors)
+        self.assertEqual(errors['dosis'], 'La dosis debe ser mayor a cero')
+
+
+class ProductModelTest(TestCase):
+
+    def test_validate_product_price(self):
+        data = {
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': -100
+        }
+        errors = validate_product(data)
+        self.assertIn('price', errors)
+        self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
+
+    def test_can_create_and_get_product(self):
+        Product.save_product(
+            {
+                "name": "Hueso",
+                "type": "Juguete",
+                "price": 100.0,
+            }
+        )
+        products = Product.objects.all()
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].name, "Hueso")
+        self.assertEqual(products[0].type, "Juguete")
+        self.assertEqual(products[0].price, 100.0)
+
+    def test_can_update_product(self):
+        Product.save_product(
+            {
+                "name": "Hueso",
+                "type": "Juguete",
+                "price": 100.0,
+            }
+        )
+        product = Product.objects.get(pk=1)
+        self.assertEqual(product.price, 100.0)
+        product.update_product( {
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': 200.0
+           } )
+        product_updated = Product.objects.get(pk=1)
+        self.assertEqual(product_updated.price, 200.0)
+
+
 class PetModelTest(TestCase):
     def test_invalid_weight(self):
         result, errors = Pet.save_pet({
@@ -134,3 +211,34 @@ class PetModelTest(TestCase):
         })
         self.assertEqual(result, True)
         self.assertIsNone(errors)
+
+
+class VetTestCase(TestCase):
+    def test_speciality_vet(self):
+        vet = Vet.objects.create(
+            name="Juan Sebastian Veron",
+            email="juan@example.com",
+            phone="1234567890",
+            speciality=EspecialidadVeterinario.CIRUGIA
+        )
+        self.assertEqual(vet.speciality, EspecialidadVeterinario.CIRUGIA)        
+
+    def test_can_create_and_get_vet(self):
+        Vet.save_vet(
+            {
+                "name": "Juan Sebastian Veron",
+                "email": "brujita75@hotmail.com",
+                "phone": "221555232",
+                "speciality": "EspecialidadVeterinario.CIRUGIA",
+            }
+        )
+        vet = Vet.objects.all()
+        self.assertEqual(len(vet), 1)
+
+        self.assertEqual(vet[0].name, "Juan Sebastian Veron")
+        self.assertEqual(vet[0].email, "brujita75@hotmail.com")
+        self.assertEqual(vet[0].phone, "221555232")
+        self.assertEqual(vet[0].speciality, "EspecialidadVeterinario.CIRUGIA")
+        
+
+      

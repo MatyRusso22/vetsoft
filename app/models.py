@@ -40,11 +40,15 @@ def validate_medicine(data):
         errors["dosis"] = "Por favor ingrese una dosis"
     else: 
         try:
-            dosis_entero = int(dosis)
-            if dosis_entero <= 0:
+            dosis = float(dosis)
+            if dosis <= 0:
                 errors['dosis'] = "La dosis debe ser mayor a cero"
+            elif dosis  < 1:
+                errors["dosis"] = "La dosis debe ser mayor o igual que 1"
+            elif dosis > 10:
+                errors["dosis"] = "La dosis debe ser menor que 10"
         except ValueError:
-            errors['dosis'] = "La cantidad de dosis debe ser un numero entero"
+            errors["dosis"] = "La cantidad de dosis no es correcta"
     return errors
 
 def validate_provider(data):
@@ -69,24 +73,26 @@ def validate_provider(data):
 
 def validate_product(data):
     errors = {}
+    
     name = data.get("name","")
     type = data.get("type","")
     price = data.get("price","")
 
     if name == "":
-        errors['name'] = 'Por favor ingrese un nombre para el producto'
-    if type == "":
-        errors['type'] = 'Por favor ingrese el tipo del producto'
-    if price == "":
-        errors['price'] = 'Por favor ingrese el precio del producto'
-    else:
-        try:
-            price_float = float(price)
-            if price_float <= 0:
-                errors['price'] = 'Por favor ingrese un precio del producto mayor que cero'
-        except ValueError:
-            errors['price'] = 'Por favor ingrese un precio válido para el producto'
+        errors["name"] = "Por favor ingrese un nombre para el producto"
+        
+    if type =="":
+        errors["type"] = "Por favor ingrese el tipo del producto"
 
+    if price == "" :
+        errors["price"] = "Por favor ingrese el precio del producto"
+    else:
+        try: 
+            if float(price) <= 0:
+                errors["price"] = "Por favor ingrese un precio del producto mayor que cero"
+        except ValueError:
+            errors["price"] = "Por favor ingrese un precio valido para el producto"
+  
     return errors
 
 
@@ -96,7 +102,7 @@ def validate_Vet(data):
     name = data.get("name", "")
     email = data.get("email", "")
     phone = data.get("phone", "")
-    
+    speciality = data.get("speciality", "")
 
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
@@ -108,6 +114,9 @@ def validate_Vet(data):
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
+
+    if speciality == "":
+        errors["speciality"] = "Por favor ingrese una especialidad"
  
 
     return errors
@@ -223,11 +232,17 @@ class Medicine(models.Model):
         return True, None
 
     def update_medicine(self, medicine_data):
+        errors = validate_medicine(medicine_data)
+
+        if len(errors.keys()) > 0:
+            return False, errors
+        
         self.name = medicine_data.get("name", "") or self.name
         self.descripcion = medicine_data.get("descripcion", "") or self.descripcion
         self.dosis = medicine_data.get("dosis", "") or self.dosis
-
         self.save()
+    
+        return True, None
 
 class Provider(models.Model):
     name = models.CharField(max_length=100)
@@ -281,16 +296,24 @@ class Product(models.Model):
         return True, None
 
     def update_product(self, product_data):
+        errors = validate_product(product_data)  
+
+        if len(errors.keys()) > 0:
+            return False, errors
+        
         self.name = product_data.get("name", "") or self.name
-        self.type = product_data.get("type", "") or self.descripcion
+        self.type = product_data.get("type", "") or self.type
         self.price = product_data.get("price", "") or self.price
 
         self.save()
+        
+        return True, None
 
 class Vet(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=10)
+    speciality = models.CharField(max_length=100, default='General')
 
     def __str__(self):
         return self.name
@@ -305,7 +328,7 @@ class Vet(models.Model):
             name=vet_data.get("name"),
             email=vet_data.get("email"),
             phone=vet_data.get("phone"),
-                      
+            speciality=vet_data.get("speciality"),          
         )
 
         return True, None
@@ -314,8 +337,13 @@ class Vet(models.Model):
         self.name = vet_data.get("name", "") or self.name
         self.email = vet_data.get("email", "") or self.email  
         self.phone = vet_data.get("phone", "") or self.phone
-          
+        self.speciality = vet_data.get("speciality", "") or self.speciality  
         self.save()
  
-
+class EspecialidadVeterinario(models.TextChoices):
+    GENERAL = 'General', 'General'
+    CIRUGIA = 'Cirugía', 'Cirugía'
+    DERMATOLOGIA = 'Dermatología', 'Dermatología'
+    ODONTOLOGIA = 'Odontología', 'Odontología'
+    OTRA = 'Otra', 'Otra'
        
