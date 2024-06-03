@@ -57,7 +57,12 @@
                         name="email"
                         class="form-control {% if errors.email %}is-invalid{% endif %}"
                         value="{{ client.email }}"
-                        required/>
+                        required
+                        pattern=".*@vetsoft\.com"
+                        title="El email debe terminar en @vetsoft.com"
+                        oninput="this.setCustomValidity('')"
+                        oninvalid="this.setCustomValidity('El email debe terminar en @vetsoft.com')"
+                    />
 
                     {% if errors.email %}
                         <div class="invalid-feedback">
@@ -89,4 +94,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const emailField = document.getElementById('email');
+        emailField.addEventListener('input', function(event) {
+            const value = event.target.value;
+            if (!value.endsWith('@vetsoft.com')) {
+                emailField.setCustomValidity('El email debe terminar en @vetsoft.com');
+            } else {
+                emailField.setCustomValidity('');
+            }
+        });
+    });
+</script>
 {% endblock %}
