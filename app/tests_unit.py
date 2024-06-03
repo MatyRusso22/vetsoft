@@ -1,13 +1,18 @@
+
 from django.test import TestCase
-from app.models import Client, validate_medicine
-from app.models import Provider
-from app.models import Medicine
-from app.models import Product,validate_product
-from app.models import Pet
-from datetime import datetime
 
+from app.models import (
+    Client,
+    EspecialidadVeterinario,
+    Medicine,
+    Pet,
+    Product,
+    Provider,
+    Vet,
+    validate_medicine,
+    validate_product,
+)
 
-from app.models import Vet , EspecialidadVeterinario
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):

@@ -1,12 +1,17 @@
-from django.test import TestCase
-from django.shortcuts import reverse
-from app.models import Client
-from app.models import Provider
-from app.models import Medicine
-from app.models import Pet
 from datetime import date
-from app.models import Product
-from app.models import Vet , EspecialidadVeterinario
+
+from django.shortcuts import reverse
+from django.test import TestCase
+
+from app.models import (
+    Client,
+    EspecialidadVeterinario,
+    Medicine,
+    Pet,
+    Product,
+    Provider,
+    Vet,
+)
 
 
 class HomePageTest(TestCase):
