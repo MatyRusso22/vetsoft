@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 
 
 def validate_client(data):
+    """Valida que no se genere un cliente vacio en la veterinaria"""
     errors = {}
 
     name = data.get("name", "")
@@ -24,6 +25,7 @@ def validate_client(data):
     return errors
 
 def validate_medicine(data):
+    """Valida que no se genere una medicina vacia en la veterinaria y  que la dosis este entre 1 y 10"""
     errors = {}
 
     name = data.get("name", "")
@@ -52,6 +54,7 @@ def validate_medicine(data):
     return errors
 
 def validate_provider(data):
+    """Valida que no se genere un proveedor vacio en la veterinaria"""
     errors = {}
 
     name = data.get("name", "")
@@ -72,6 +75,7 @@ def validate_provider(data):
 
 
 def validate_product(data):
+    """Valida que no se genere un producto vacio vacio en la veterinaria y que el precio de un producto sea mayor a 0"""
     errors = {}
     
     name = data.get("name","")
@@ -97,6 +101,7 @@ def validate_product(data):
 
 
 def validate_Vet(data):
+    """Valida que no se genere un veterinario vacio en la veterinaria"""
     errors = {}
 
     name = data.get("name", "")
