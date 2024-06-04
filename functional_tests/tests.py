@@ -13,7 +13,7 @@ from app.models import Provider
 from app.models import Pet
 from app.models import Product
 
-from app.models import Vet , EspecialidadVeterinario
+from app.models import Vet  
 
 from app.models import Medicine
 

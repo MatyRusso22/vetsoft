@@ -191,8 +191,7 @@ class Pet(models.Model):
         """
         errors = {}
 
-        name = data.get("name", "")
-        breed = data.get("breed", "")
+        name = data.get("name", "") 
         birthday = data.get("birthday", "")
         weight = data.get("weight", "")
         if birthday == "":

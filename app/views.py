@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect , get_object_or_404
 from django.urls import reverse
 from .models import Client 
 from .models import Pet
@@ -6,8 +6,7 @@ from .forms import PetForm
 from .models import Medicine 
 from .models import Provider 
 from .models import Product 
-from .models import Vet
-from .forms import VetForm
+from .models import Vet 
 
 
 def home(request):
@@ -284,10 +283,7 @@ def vet_form(request, id=None):
 
     vet = None
     if id is not None:
-        vet = get_object_or_404(Vet, pk=id)
-
-    form = VetForm(request.POST or None, instance=vet)
-
+        vet = get_object_or_404(Vet, pk=id) 
     return render(request, "vet/form.html", {"vet": vet})
 
 
