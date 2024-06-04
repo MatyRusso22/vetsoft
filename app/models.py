@@ -1,6 +1,4 @@
 from django.db import models
-from datetime import datetime
-from django.core.exceptions import ValidationError
 
 
 def validate_client(data):
@@ -171,7 +169,6 @@ class Pet(models.Model):
         errors = {}
 
         name = data.get("name", "")
-        breed = data.get("breed", "")
         birthday = data.get("birthday", "")
         weight = data.get("weight", "")
         if birthday == "":
