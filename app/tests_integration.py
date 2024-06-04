@@ -110,7 +110,9 @@ class ClientsTest(TestCase):
 class ProvidersTest(TestCase):
 
     def test_can_create_provider_with_valid_address(self):
-        # Prueba que se pueda crear un nuevo proveedor con una dirección válida.
+        """
+        Prueba que se pueda crear un nuevo proveedor con una dirección válida.
+        """
         
         response = self.client.post(
             reverse("provider_form"),
@@ -130,8 +132,9 @@ class ProvidersTest(TestCase):
         self.assertRedirects(response, reverse("provider_repo"))
 
     def test_validation_errors_create_provider_with_invalid_address(self):
-        # Prueba que se muestren errores de validación si se proporciona una dirección inválida al crear un proveedor.
-        
+        """
+        Prueba que se muestren errores de validación si se proporciona una dirección inválida al crear un proveedor.
+        """
         response = self.client.post(
             reverse("provider_form"),
             data={
@@ -143,8 +146,10 @@ class ProvidersTest(TestCase):
 
         self.assertContains(response, "Por favor ingrese una dirección")
 
-    def test_edit_provider_with_valid_address(self):
-        # Prueba que se pueda editar un proveedor existente con una dirección válida.
+    def test_edit_provider_with_valid_address(self):  
+        """
+        Prueba que se pueda editar un proveedor existente con una dirección válida.
+        """
         provider = Provider.objects.create(
             name="Luis Fernando Flores",
             address="Calle 13 y Calle 56",
@@ -168,8 +173,9 @@ class ProvidersTest(TestCase):
         self.assertEqual(editedProvider.email, provider.email)
 
     def test_edit_provider_with_invalid_address(self):
-        #Prueba que no se pueda editar un proveedor existente con una dirección inválida ,si no que se quedara con la dirección valida que tenía
-
+        """
+        Prueba que no se pueda editar un proveedor existente con una dirección inválida ,si no que se quedara con la dirección valida que tenía
+        """  
         provider = Provider.objects.create(
             name="Luis Fernando Flores",
             address="Calle 13 y Calle 56",

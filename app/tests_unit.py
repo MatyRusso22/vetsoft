@@ -163,6 +163,35 @@ class ProductModelTest(TestCase):
         self.assertIn('price', errors)
         self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
 
+    def test_validate_product_price_zero(self):
+        data = {
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': 0
+        }
+        errors = validate_product(data)
+        self.assertIn('price', errors)
+        self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
+
+    def test_validate_product_price_non_numeric(self):
+        data = {
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': 'abc'
+        }
+        errors = validate_product(data)
+        self.assertIn('price', errors)
+        self.assertEqual(errors['price'], 'Por favor ingrese un precio válido para el producto')
+
+    def test_validate_product_price_valid(self):
+        data = {
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': 100.0
+        }
+        errors = validate_product(data)
+        self.assertNotIn('price', errors)
+
     def test_can_create_and_get_product(self):
         Product.save_product(
             {
@@ -195,6 +224,39 @@ class ProductModelTest(TestCase):
         product_updated = Product.objects.get(pk=1)
         self.assertEqual(product_updated.price, 200.0)
 
+    def test_validate_update_product_price_negative(self):
+        product = Product.save_product(
+            {
+                "name": "Hueso",
+                "type": "Juguete",
+                "price": 100.0,
+            }
+        )
+        product = Product.objects.get(pk=1)
+        errors = product.update_product({
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': -200.0
+        })
+        self.assertIn('price', errors)
+        self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
+
+    def test_validate_update_product_price_zero(self):
+        product = Product.save_product(
+            {
+                "name": "Hueso",
+                "type": "Juguete",
+                "price": 100.0,
+            }
+        )
+        product = Product.objects.get(pk=1)
+        errors = product.update_product({
+            'name': 'Hueso',
+            'type': 'Juguete',
+            'price': 0
+        })
+        self.assertIn('price', errors)
+        self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
 
 class PetModelTest(TestCase):
     def test_invalid_weight(self):
