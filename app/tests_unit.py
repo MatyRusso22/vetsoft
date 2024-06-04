@@ -16,6 +16,9 @@ from app.models import (
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):
+        """
+        Prueba la creación de un cliente y la obtención del mismo.
+        """
         Client.save_client(
             {
                 "name": "Juan Sebastian Veron",
@@ -33,6 +36,9 @@ class ClientModelTest(TestCase):
         self.assertEqual(clients[0].email, "brujita75@hotmail.com")
 
     def test_can_update_client(self):
+        """
+        Prueba la actualización de un cliente existente.
+        """
         Client.save_client(
             {
                 "name": "Juan Sebastian Veron",
@@ -52,6 +58,9 @@ class ClientModelTest(TestCase):
         self.assertEqual(client_updated.phone, "221555233")
 
     def test_update_client_with_error(self):
+        """
+        Verifica que no se pueda actualizar un cliente con datos incorrectos.
+        """
         Client.save_client(
             {
                 "name": "Juan Sebastian Veron",
@@ -72,6 +81,9 @@ class ClientModelTest(TestCase):
 
 class ProviderModelTest(TestCase):
     def test_can_create_and_get_provider_with_address(self):
+        """
+        Prueba la creación de un proveedor con dirección y la obtención del mismo.
+        """
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -87,6 +99,9 @@ class ProviderModelTest(TestCase):
         self.assertEqual(providers[0].address, "ElSalvador 245")
 
     def test_can_update_provider_address(self):
+        """
+        Prueba la actualización de la dirección de un proveedor.
+        """
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -105,6 +120,9 @@ class ProviderModelTest(TestCase):
         self.assertEqual(provider_updated.address, "SanMartin 212")
 
     def test_update_provider_address_with_error(self):
+        """
+        Verifica que no se pueda actualizar la dirección de un proveedor con datos incorrectos.
+        """
         Provider.save_provider(
             {
                 "name": "Luis Fernando Flores",
@@ -126,6 +144,9 @@ class ProviderModelTest(TestCase):
 
 class MedicineModelTest(TestCase):
     def test_can_create_and_get_medicine_with_valid_dose(self):
+        """
+        Prueba la creación de un medicamento con dosis válida y la obtención del mismo.
+        """
         Medicine.save_medicine(
             {
                 "name": "Ibuprofeno",
@@ -141,6 +162,9 @@ class MedicineModelTest(TestCase):
         self.assertEqual(medicines[0].dosis, 2)
 
     def test_validate_product_dosis(self):
+        """
+        Verifica la validación de la dosis de un medicamento.
+        """
         data = {
             'name': 'Paracetamol',
             'descripcion': 'Dolores de cabeza',
@@ -154,6 +178,9 @@ class MedicineModelTest(TestCase):
 class ProductModelTest(TestCase):
 
     def test_validate_product_price(self):
+        """
+        Verifica la validación del precio de un producto negativo.
+        """
         data = {
             'name': 'Hueso',
             'type': 'Juguete',
@@ -164,6 +191,9 @@ class ProductModelTest(TestCase):
         self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
 
     def test_validate_product_price_zero(self):
+        """
+        Verifica la validación del precio de un producto igual a cero.
+        """
         data = {
             'name': 'Hueso',
             'type': 'Juguete',
@@ -174,6 +204,9 @@ class ProductModelTest(TestCase):
         self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
 
     def test_validate_product_price_non_numeric(self):
+        """
+        Verifica la validación del precio de un producto no numérico.
+        """
         data = {
             'name': 'Hueso',
             'type': 'Juguete',
@@ -184,6 +217,9 @@ class ProductModelTest(TestCase):
         self.assertEqual(errors['price'], 'Por favor ingrese un precio válido para el producto')
 
     def test_validate_product_price_valid(self):
+        """
+        Verifica la validación de un precio de producto válido.
+        """
         data = {
             'name': 'Hueso',
             'type': 'Juguete',
@@ -193,6 +229,9 @@ class ProductModelTest(TestCase):
         self.assertNotIn('price', errors)
 
     def test_can_create_and_get_product(self):
+        """
+        Prueba la creación de un producto y la obtención del mismo.
+        """
         Product.save_product(
             {
                 "name": "Hueso",
@@ -207,6 +246,9 @@ class ProductModelTest(TestCase):
         self.assertEqual(products[0].price, 100.0)
 
     def test_can_update_product(self):
+        """
+        Prueba la actualización de un producto existente.
+        """
         Product.save_product(
             {
                 "name": "Hueso",
@@ -223,8 +265,11 @@ class ProductModelTest(TestCase):
            } )
         product_updated = Product.objects.get(pk=1)
         self.assertEqual(product_updated.price, 200.0)
-
+        
     def test_validate_update_product_price_negative(self):
+        """
+        Verifica la validación del precio de un producto negativo al actualizarlo.
+        """
         product = Product.save_product(
             {
                 "name": "Hueso",
@@ -242,6 +287,9 @@ class ProductModelTest(TestCase):
         self.assertEqual(errors['price'], 'Por favor ingrese un precio del producto mayor que cero')
 
     def test_validate_update_product_price_zero(self):
+        """
+        Verifica la validación del precio de un producto igual a cero al actualizarlo.
+        """
         product = Product.save_product(
             {
                 "name": "Hueso",
@@ -260,6 +308,9 @@ class ProductModelTest(TestCase):
 
 class PetModelTest(TestCase):
     def test_invalid_weight(self):
+        """
+        Verifica la validación de un peso negativo al guardar una mascota.
+        """
         result, errors = Pet.save_pet({
             "name": "Mascota Invalida",
             "breed": "no pasa",
@@ -270,6 +321,9 @@ class PetModelTest(TestCase):
         self.assertDictEqual(errors, {'weight': 'El peso debe ser mayor que 0'})
 
     def test_valid_weight(self):
+        """ 
+        Prueba la creación de una mascota con un peso válido. 
+        """
         result, errors = Pet.save_pet({
             "name": "Mascota Valida",
             "breed": "pasa",
@@ -282,6 +336,9 @@ class PetModelTest(TestCase):
 
 class VetTestCase(TestCase):
     def test_speciality_vet(self):
+        """
+        Prueba la creación de un veterinario con especialidad.
+        """
         vet = Vet.objects.create(
             name="Juan Sebastian Veron",
             email="juan@example.com",
@@ -291,6 +348,9 @@ class VetTestCase(TestCase):
         self.assertEqual(vet.speciality, EspecialidadVeterinario.CIRUGIA)        
 
     def test_can_create_and_get_vet(self):
+        """
+        Prueba la creación de un veterinario y la obtención del mismo.
+        """
         Vet.save_vet(
             {
                 "name": "Juan Sebastian Veron",
