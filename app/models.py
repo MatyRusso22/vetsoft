@@ -19,6 +19,9 @@ def validate_client(data):
     elif email.count("@") == 0:
         errors["email"] = "Por favor ingrese un email valido"
 
+    if not str(phone).startswith("54"):
+        errors["phone"] = "El teléfono debe comenzar con 54"
+
     return errors
 
 def validate_medicine(data):
@@ -122,7 +125,7 @@ def validate_Vet(data):
 
 class Client(models.Model):
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
+    phone = models.IntegerField()
     email = models.EmailField()
     address = models.CharField(max_length=100, blank=True)
 
