@@ -1,9 +1,6 @@
 from django import forms
-from .models import Pet
-from .models import Medicine
-from .models import Provider
-from .models import Product
-from .models import Vet
+
+from .models import Medicine, Pet, Product, Provider, Vet
 
 
 class PetForm(forms.ModelForm):

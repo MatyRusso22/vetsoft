@@ -3,19 +3,10 @@ import os
 from datetime import datetime
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from playwright.sync_api import sync_playwright, expect, Browser
-
 from django.urls import reverse
+from playwright.sync_api import Browser, expect, sync_playwright
 
-from app.models import Client
-
-from app.models import Provider
-from app.models import Pet
-from app.models import Product
-
-from app.models import Vet  
-
-from app.models import Medicine
+from app.models import Client, Medicine, Pet, Product, Provider, Vet
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 playwright = sync_playwright().start()
