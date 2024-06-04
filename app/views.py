@@ -1,28 +1,33 @@
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect , get_object_or_404
 from django.urls import reverse
 from .models import Client 
 from .models import Pet
 from .forms import PetForm
-from .models import Medicine
-from .forms import MedicineForm
-from .models import Provider
-from .forms import ProviderForm
-from .models import Product
-from .forms import ProductForm
-from .models import Vet
-from .forms import VetForm
+from .models import Medicine 
+from .models import Provider 
+from .models import Product 
+from .models import Vet 
 
 
 def home(request):
+    """
+    Renderiza la página de inicio.
+    """
     return render(request, "home.html")
 
 
 def clients_repository(request):
+    """
+    Muestra el repositorio de clientes.
+    """
     clients = Client.objects.all()
     return render(request, "clients/repository.html", {"clients": clients})
 
 
 def clients_form(request, id=None):
+    """
+    Maneja el formulario para crear o actualizar un cliente.
+    """
     if request.method == "POST":
         client_id = request.POST.get("id", "")
         errors = {}
@@ -49,6 +54,9 @@ def clients_form(request, id=None):
 
 
 def clients_delete(request):
+    """
+    Elimina un cliente.
+    """
     client_id = request.POST.get("client_id")
     client = get_object_or_404(Client, pk=int(client_id))
     client.delete()
@@ -56,10 +64,16 @@ def clients_delete(request):
     return redirect(reverse("clients_repo"))
 
 def pets_repository(request):
+    """
+    Muestra el repositorio de mascotas.
+    """
     pets = Pet.objects.all()
     return render(request, "pets/repository.html", {"pets": pets})
 
 def pets_form(request, id=None):
+    """
+    Maneja el formulario para crear o actualizar una mascota.
+    """
     errors = {}
     pet = None
     saved = True
@@ -90,6 +104,9 @@ def pets_form(request, id=None):
     )
 
 def pets_delete(request):
+    """
+    Elimina una mascota.
+    """
     pet_id = request.POST.get("pet_id")
     pet = get_object_or_404(Pet, pk=int(pet_id))
     pet.delete()
@@ -97,10 +114,16 @@ def pets_delete(request):
 
 
 def medicines_repository(request):
+    """
+    Muestra el repositorio de medicamentos.
+    """
     medicine = Medicine.objects.all()
     return render(request, "medicines/repository.html", {"medicines": medicine})
 
 def medicines_form(request, id=None):
+    """
+    Maneja el formulario para crear o actualizar un medicamento.
+    """
     if request.method == "POST":
         saved = True
         errors = {}
@@ -127,16 +150,25 @@ def medicines_form(request, id=None):
 
 
 def medicines_delete(request):
+    """
+    Elimina un medicamento.
+    """
     medicine_id = request.POST.get("medicine_id")
     medicine = get_object_or_404(Medicine, pk=int(medicine_id))
     medicine.delete()
     return redirect(reverse("medicines_repo"))
 
 def provider_repository(request):
+    """
+    Muestra el repositorio de proveedores.
+    """
     providers = Provider.objects.all()
     return render(request, "provider/repository.html", {"providers": providers})
 
 def provider_form(request, id=None):
+    """
+    Maneja el formulario para crear o actualizar un proveedor.
+    """
     if request.method == "POST":
         provider_id = request.POST.get("id", "")
         errors = {}
@@ -165,17 +197,26 @@ def provider_form(request, id=None):
 
 
 def provider_delete(request):
+    """
+    Elimina un proveedor.
+    """
     provider_id = request.POST.get("provider_id")
     provider = get_object_or_404(Provider, pk=int(provider_id))
     provider.delete()
     return redirect(reverse("provider_repo"))
 
 def products_repository(request):
+    """
+    Muestra el repositorio de productos.
+    """
     products = Product.objects.all()
     return render(request, "products/repository.html", {"products": products})
 
 
 def products_form(request, id=None):
+    """
+    Maneja el formulario para crear o actualizar un producto.
+    """
     if request.method == "POST":
         product_id = request.POST.get("id", "")
         errors = {}
@@ -201,6 +242,9 @@ def products_form(request, id=None):
     return render(request, "products/form.html", {"product": product})
 
 def products_delete(request):
+    """
+    Elimina un producto.
+    """
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, pk=int(product_id))
     product.delete()
@@ -208,11 +252,17 @@ def products_delete(request):
     return redirect(reverse("products_repo"))
 
 def vet_repository(request):
+    """
+    Muestra el repositorio de veterinarios.
+    """
     vet = Vet.objects.all()
     return render(request, "vet/repository.html", {"vet": vet})
 
 
 def vet_form(request, id=None):
+    """
+    Maneja el formulario para crear o actualizar un veterinario.
+    """
     if request.method == "POST":
         vet_id = request.POST.get("id", "")
         errors = {}
@@ -233,14 +283,14 @@ def vet_form(request, id=None):
 
     vet = None
     if id is not None:
-        vet = get_object_or_404(Vet, pk=id)
-
-    form = VetForm(request.POST or None, instance=vet)
-
+        vet = get_object_or_404(Vet, pk=id) 
     return render(request, "vet/form.html", {"vet": vet})
 
 
 def vet_delete(request):
+    """
+    Elimina un veterinario.
+    """
     vet_id = request.POST.get("vet_id")
     vet = get_object_or_404(Vet, pk=int(vet_id))
     vet.delete()
