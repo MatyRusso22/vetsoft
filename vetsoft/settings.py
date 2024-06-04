@@ -29,8 +29,11 @@ DEBUG = True
 
 SECRET_KEY = os.getenv("SECRET_KEY")
   
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', '*', "vetsoft-app-1-0-0.onrender.com"]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://vetsoft-app-1-0-0.onrender.com',
+]
 
 # Application definition
 

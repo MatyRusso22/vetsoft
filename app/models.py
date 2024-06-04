@@ -186,6 +186,9 @@ class Pet(models.Model):
 
     @classmethod
     def validate_pet(cls, data):
+        """
+        Valida los datos de la mascota. 
+        """
         errors = {}
 
         name = data.get("name", "")
