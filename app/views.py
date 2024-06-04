@@ -1,8 +1,16 @@
-from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.urls import reverse
-
-from .forms import PetForm, VetForm
-from .models import Client, Medicine, Pet, Product, Provider, Vet
+from .models import Client 
+from .models import Pet
+from .forms import PetForm
+from .models import Medicine
+from .forms import MedicineForm
+from .models import Provider
+from .forms import ProviderForm
+from .models import Product
+from .forms import ProductForm
+from .models import Vet
+from .forms import VetForm
 
 
 def home(request):
