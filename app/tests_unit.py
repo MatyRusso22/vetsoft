@@ -3,8 +3,7 @@ from app.models import Client, validate_medicine
 from app.models import Provider
 from app.models import Medicine
 from app.models import Product,validate_product
-from app.models import Pet
-from datetime import datetime
+from app.models import Pet 
 
 
 from app.models import Vet , EspecialidadVeterinario

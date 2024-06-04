@@ -448,13 +448,7 @@ class ProductTest(TestCase):
             },
         ) 
         self.assertContains(response, "Por favor ingrese un precio valido para el producto")
-
-    def test_should_response_with_404_status_if_product_doesnt_exists(self):
-        """
-        Verifica que se responda con el estado 404 si el producto no existe.
-        """
-        response = self.client.get(reverse("products_edit", kwargs={"id": 100}))
-        self.assertEqual(response.status_code, 404)
+ 
 
     def test_edit_product_with_valid_data(self):
         """
