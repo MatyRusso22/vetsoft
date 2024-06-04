@@ -214,7 +214,7 @@ class ProductModelTest(TestCase):
         }
         errors = validate_product(data)
         self.assertIn('price', errors)
-        self.assertEqual(errors['price'], 'Por favor ingrese un precio válido para el producto')
+        self.assertEqual(errors['price'], 'Por favor ingrese un precio valido para el producto')
 
     def test_validate_product_price_valid(self):
         """
@@ -278,7 +278,7 @@ class ProductModelTest(TestCase):
             }
         )
         product = Product.objects.get(pk=1)
-        errors = product.update_product({
+        ValueError,errors = product.update_product({
             'name': 'Hueso',
             'type': 'Juguete',
             'price': -200.0
@@ -298,7 +298,7 @@ class ProductModelTest(TestCase):
             }
         )
         product = Product.objects.get(pk=1)
-        errors = product.update_product({
+        ValueError,errors = product.update_product({
             'name': 'Hueso',
             'type': 'Juguete',
             'price': 0
