@@ -37,11 +37,14 @@
                 </div>
                 <div>
                     <label for="phone" class="form-label">Teléfono</label>
-                    <input type="text"
+                    <input type="number"
                         id="phone"
                         name="phone"
                         class="form-control"
                         value="{{client.phone}}"
+                        pattern="^54\d+(.\d+)?$"
+                        step="1"
+                        oninput="this.value = this.value.replace(/[^\d]/g, '')"
                         required/>
 
                     {% if errors.phone %}
