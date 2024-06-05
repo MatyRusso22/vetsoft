@@ -13,14 +13,14 @@ def validate_client(data):
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
-
+    elif not str(phone).startswith("54"):
+            errors["phone"] = "El teléfono debe comenzar con 54"
+            
     if email == "":
         errors["email"] = "Por favor ingrese un email"
     elif email.count("@") == 0:
         errors["email"] = "Por favor ingrese un email valido"
-
-    if not str(phone).startswith("54"):
-        errors["phone"] = "El teléfono debe comenzar con 54"
+    
 
     return errors
 
