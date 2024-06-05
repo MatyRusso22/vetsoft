@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 def validate_client(data):
@@ -100,8 +101,7 @@ def validate_Vet(data):
     name = data.get("name", "")
     email = data.get("email", "")
     phone = data.get("phone", "")
-    speciality = data.get("speciality", "")
-
+    speciality= data.get("speciality","")
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
 
@@ -112,12 +112,14 @@ def validate_Vet(data):
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
-
-    if speciality == "":
-        errors["speciality"] = "Por favor ingrese una especialidad"
- 
+    
+    if speciality == "" or speciality is None:
+        errors["speciality"] = "Por favor seleccione una especialidad válida"
+    elif speciality not in [choice[0] for choice in Vet.SPECIALITY_CHOICES.choices]:
+        errors["speciality"] = "Especialidad no válida"
 
     return errors
+
 
 
 class Client(models.Model):
@@ -437,65 +439,54 @@ class Product(models.Model):
         return True, None
 
 class Vet(models.Model):
+    class SPECIALITY_CHOICES(models.TextChoices):
+        CARDIOLOGIA="Cardiologia", _("Cardiologia")
+        NEUROLOGIA="Neurologia", _("Neurologia")
+        ONCOLOGIA="Oncologia", _("Oncologia")
+        NUTRICION="Nutricion", _("Nutricion")
+        CLINICA="Clinica", _("Clinica")
+
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    phone = models.CharField(max_length=10)
-    speciality = models.CharField(max_length=100, default='General')
+    phone = models.CharField(max_length=15)
+    speciality = models.CharField(max_length=50, choices=SPECIALITY_CHOICES, default=SPECIALITY_CHOICES.CLINICA)
 
     def __str__(self):
         """
-        Devuelve una representación en cadena del objeto.
-
-        Returns:
-            Una cadena que representa el nombre del objeto.
+        Devuelve una representacion en cadena de objeto
         """
         return self.name
 
     @classmethod
-    def save_vet(cls, vet_data):
+    def save_vet(cls, data):
         """
-        Guarda un veterinario en la base de datos.
-
-        Args:
-            vet_data: un diccionario que contiene los datos del veterinario.
-
-        Returns:
-            Una tupla (booleano, errores) donde el booleano indica el éxito de la operación
-            y los errores contiene los errores de validación si los hay.
+        Guarda un veterinario
         """
-        errors = validate_Vet(vet_data)
+        errors = validate_Vet(data)
+
         if len(errors.keys()) > 0:
             return False, errors
-            
-        Vet.objects.create(
-            name=vet_data.get("name"),
-            email=vet_data.get("email"),
-            phone=vet_data.get("phone"),
-            speciality=vet_data.get("speciality"),          
+        
+        Vet.objects.create (
+            name=data.get('name'),
+            email=data.get('email'),
+            phone=data.get('phone'),
+            speciality=data.get('speciality'),
         )
+        return True, None 
 
-        return True, None
-
-    def update_vet(self, vet_data):
+    def update_vet(self, data):
         """
-        Actualiza un veterinario en la base de datos.
-
-        Args:
-            vet_data: un diccionario que contiene los nuevos datos del veterinario.
-
-        Returns:
-            Ninguno.
+        Guarda la edicion de un veterinario
         """
-        self.name = vet_data.get("name", "") or self.name
-        self.email = vet_data.get("email", "") or self.email  
-        self.phone = vet_data.get("phone", "") or self.phone
-        self.speciality = vet_data.get("speciality", "") or self.speciality  
+        errors = validate_Vet(data)
+
+        if len(errors.keys()) > 0:
+            return False, errors
+        self.name = data.get('name')
+        self.email = data.get('email')
+        self.phone = data.get('phone')
+        self.speciality = data.get('speciality')
         self.save()
- 
-class EspecialidadVeterinario(models.TextChoices):
-    GENERAL = 'General', 'General'
-    CIRUGIA = 'Cirugía', 'Cirugía'
-    DERMATOLOGIA = 'Dermatología', 'Dermatología'
-    ODONTOLOGIA = 'Odontología', 'Odontología'
-    OTRA = 'Otra', 'Otra'
+        return True, {}
        
