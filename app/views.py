@@ -35,7 +35,7 @@ def clients_form(request, id=None):
         if saved:
             return redirect(reverse("clients_repo"))
         return render(
-            request, "clients/form.html", {"errors": errors, "client": request.POST}
+            request, "clients/form.html", {"errors": errors, "client": request.POST},
         )
 
     client = None
@@ -88,7 +88,7 @@ def pets_form(request, id=None):
             pet = get_object_or_404(Pet, pk=id)
     form = PetForm(request.POST or None, instance=pet)
     return render(
-        request, "pets/form.html", {"errors": errors, "form": form, "form_title": "Agregar Mascota", "form_action": "pets_form"}
+        request, "pets/form.html", {"errors": errors, "form": form, "form_title": "Agregar Mascota", "form_action": "pets_form"},
     )
 
 def pets_delete(request):
@@ -166,7 +166,7 @@ def provider_form(request, id=None):
             return redirect(reverse("provider_repo"))
 
         return render(
-            request, "provider/form.html", {"errors": errors, "provider": request.POST}
+            request, "provider/form.html", {"errors": errors, "provider": request.POST},
         )
     provider = None
     if id is not None:
@@ -207,7 +207,7 @@ def products_form(request, id=None):
         if saved:
             return redirect(reverse("products_repo"))
         return render(
-            request, "products/form.html", {"errors": errors, "product": request.POST}
+            request, "products/form.html", {"errors": errors, "product": request.POST},
         )
     
     product = None
@@ -251,7 +251,7 @@ def vet_form(request, id=None):
             return redirect(reverse("vet_repo"))
 
         return render(
-            request, "vet/form.html", {"errors": errors, "vet": request.POST, "specialities" : specialities}
+            request, "vet/form.html", {"errors": errors, "vet": request.POST, "specialities" : specialities},
         )
 
     vet = None
