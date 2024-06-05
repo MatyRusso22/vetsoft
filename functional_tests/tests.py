@@ -274,13 +274,28 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         expect(self.page.get_by_role("form")).to_be_visible() 
 
         self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
-        self.page.get_by_label("Teléfono").fill("221555232")
+        self.page.get_by_label("Teléfono").fill("221232555")
         self.page.get_by_label("Email").fill("brujita75@vetsoft.com")
         self.page.get_by_label("Dirección").fill("13 y 44")
 
         self.page.get_by_role("button", name="Guardar").click() 
 
         expect(self.page.get_by_text("El teléfono debe comenzar con 54")).to_be_visible() 
+
+    def test_shouldnt_be_able_to_create_client_with_no_email_end_vetsoft(self):
+        """Prueba que no se pueda crear un cliente con un telefono que no empieza con 54"""
+        self.page.goto(f"{self.live_server_url}{reverse('clients_form')}") 
+
+        expect(self.page.get_by_role("form")).to_be_visible() 
+
+        self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
+        self.page.get_by_label("Teléfono").fill("221555232")
+        self.page.get_by_label("Email").fill("brujita75@gmail.com")
+        self.page.get_by_label("Dirección").fill("13 y 44")
+
+        self.page.get_by_role("button", name="Guardar").click() 
+
+        expect(self.page.get_by_text("El email debe terminar en @vetsoft.com")).to_be_visible() 
 
 class ProvidersTestCase(PlaywrightTestCase):
     def test_should_show_providers_data(self):
