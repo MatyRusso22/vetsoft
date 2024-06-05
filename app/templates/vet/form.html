@@ -4,14 +4,14 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-6 offset-lg-3">
-            <h1>Nuevo Vet</h1>
+            <h1>Nuevo Veterinario</h1>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-6 offset-lg-3">
             <form class="vstack gap-3 {% if errors %}was-validated{% endif %}"
-                aria-label="Formulario de creacion de veterinaria"
+                aria-label="Formulario de creacion de veterinario"
                 method="POST"
                 action="{% url 'vet_form' %}"
                 novalidate>
@@ -68,13 +68,18 @@
                 
                 <div>
                     <label for="speciality" class="form-label">Especialidad</label>
-                    <input type="text"
+                    <select type="speciality"
                         id="speciality"
                         name="speciality"
-                        class="form-control"
+                        class="form-select"
                         value="{{vet.speciality}}"
-                        required/>
-
+                        required>
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        {% for value, label in specialities %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                
                     {% if errors.speciality %}
                         <div class="invalid-feedback">
                             {{ errors.speciality }}
