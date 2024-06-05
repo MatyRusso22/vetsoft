@@ -18,11 +18,21 @@ def validate_client(data):
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
-
+    elif not phone.isdigit():
+        errors["phone"] = "Por favor ingrese un telefono valido"
+    else: 
+        try:
+            number = int(phone[:2])
+            if number != 54:
+                errors['phone'] = "El teléfono debe comenzar con 54" 
+        except ValueError:
+            errors["phone"] = "Por favor ingrese un telefono valido"
+            
     if email == "":
         errors["email"] = "Por favor ingrese un email"
     elif email.count("@") == 0:
         errors["email"] = "Por favor ingrese un email valido"
+    
 
     return errors
 
@@ -131,8 +141,11 @@ def validate_Vet(data):
 
 
 class Client(models.Model):
+    """
+    Definicion de clase cliente y sus metodos
+    """
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
+    phone = models.IntegerField()
     email = models.EmailField()
     address = models.CharField(max_length=100, blank=True)
 
@@ -193,6 +206,9 @@ class Client(models.Model):
         self.save()
 
 class Pet(models.Model):
+    """
+    Definicion de clase mascota y sus metodos
+    """
     name = models.CharField(max_length=100)
     breed = models.CharField(max_length=50, blank=True)
     birthday = models.DateField()
@@ -274,6 +290,9 @@ class Pet(models.Model):
         return self.name
 
 class Medicine(models.Model):
+    """
+    Definicion de clase medicamento y sus metodos
+    """
     name = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=100, blank=True)
     dosis = models.FloatField()
@@ -336,6 +355,9 @@ class Medicine(models.Model):
         return True, None
 
 class Provider(models.Model):
+    """
+    Definicion de clase proveedor y sus metodos
+    """
     name = models.CharField(max_length=100)
     email = models.EmailField()
     address=models.CharField(max_length=100, blank=True)
@@ -390,6 +412,9 @@ class Provider(models.Model):
         self.save()
  
 class Product(models.Model):
+    """
+    Definicion de clase producto y sus metodos
+    """
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
     price = models.FloatField()
@@ -452,6 +477,9 @@ class Product(models.Model):
         return True, None
 
 class Vet(models.Model):
+    """
+    Definicion de clase veterinario y sus metodos
+    """
     class SPECIALITY_CHOICES(models.TextChoices):
         CARDIOLOGIA="Cardiologia", _("Cardiologia")
         NEUROLOGIA="Neurologia", _("Neurologia")

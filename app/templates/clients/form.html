@@ -43,6 +43,9 @@
                         name="phone"
                         class="form-control"
                         value="{{client.phone}}"
+                        pattern="^54\d*$" 
+                        class="form-control"
+                        step="1" 
                         required/>
 
                     {% if errors.phone %}
