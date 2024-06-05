@@ -36,7 +36,7 @@ def clients_form(request, id=None):
         if saved:
             return redirect(reverse("clients_repo"))
         return render(
-            request, "clients/form.html", {"errors": errors, "client": request.POST, "cities": cities }
+            request, "clients/form.html", {"errors": errors, "client": request.POST, "cities": cities },
         )
 
     client = None
