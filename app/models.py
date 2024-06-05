@@ -14,6 +14,9 @@ def validate_client(data):
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
+    elif not phone.isdigit():
+        errors["phone"] = "Por favor ingrese un telefono valido"
+
 
     if email == "":
         errors["email"] = "Por favor ingrese un email"
@@ -124,7 +127,7 @@ def validate_Vet(data):
 
 class Client(models.Model):
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
+    phone = models.IntegerField()
     email = models.EmailField()
     address = models.CharField(max_length=100, blank=True)
 
