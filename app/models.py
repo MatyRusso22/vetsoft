@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def validate_client(data):
+    """Valida que no se genere un cliente vacio en la veterinaria"""
     errors = {}
 
     name = data.get("name", "")
@@ -14,6 +15,9 @@ def validate_client(data):
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
+    elif not phone.isdigit():
+        errors["phone"] = "Por favor ingrese un telefono valido"
+
     elif not str(phone).startswith("54"):
             errors["phone"] = "El teléfono debe comenzar con 54"
             
@@ -26,6 +30,7 @@ def validate_client(data):
     return errors
 
 def validate_medicine(data):
+    """Valida que no se genere una medicina vacia en la veterinaria y  que la dosis este entre 1 y 10"""
     errors = {}
 
     name = data.get("name", "")
@@ -54,6 +59,7 @@ def validate_medicine(data):
     return errors
 
 def validate_provider(data):
+    """Valida que no se genere un proveedor vacio en la veterinaria"""
     errors = {}
 
     name = data.get("name", "")
@@ -74,6 +80,7 @@ def validate_provider(data):
 
 
 def validate_product(data):
+    """Valida que no se genere un producto vacio vacio en la veterinaria y que el precio de un producto sea mayor a 0"""
     errors = {}
     
     name = data.get("name","")
@@ -99,6 +106,7 @@ def validate_product(data):
 
 
 def validate_Vet(data):
+    """Valida que no se genere un veterinario vacio en la veterinaria"""
     errors = {}
 
     name = data.get("name", "")
@@ -196,6 +204,7 @@ class Pet(models.Model):
         """
         errors = {}
 
+        name = data.get("name", "")
         name = data.get("name", "") 
         birthday = data.get("birthday", "")
         weight = data.get("weight", "")

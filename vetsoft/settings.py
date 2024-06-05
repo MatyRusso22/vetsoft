@@ -35,6 +35,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://vetsoft-app-1-0-0.onrender.com',
 ]
 
+
+
 # Application definition
 
 INSTALLED_APPS = [
