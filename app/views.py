@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from .forms import PetForm
-from .models import Client, Medicine, Pet, Product, Provider, Vet
+from .models import City, Client, Medicine, Pet, Product, Provider, Vet
 
 
 def home(request):
@@ -22,6 +22,7 @@ def clients_form(request, id=None):
     """
     Maneja el formulario para crear o actualizar un cliente.
     """
+    cities = City.choices
     if request.method == "POST":
         client_id = request.POST.get("id", "")
         errors = {}
@@ -31,18 +32,18 @@ def clients_form(request, id=None):
             saved, errors = Client.save_client(request.POST)
         else:
             client = get_object_or_404(Client, pk=client_id)
-            client.update_client(request.POST)
+            saved,errors=client.update_client(request.POST)
         if saved:
             return redirect(reverse("clients_repo"))
         return render(
-            request, "clients/form.html", {"errors": errors, "client": request.POST}
+            request, "clients/form.html", {"errors": errors, "client": request.POST, "cities": cities }
         )
 
     client = None
     if id is not None:
         client = get_object_or_404(Client, pk=id)
 
-    return render(request, "clients/form.html", {"client": client})
+    return render(request, "clients/form.html", {"client": client, "cities": cities})
 
 def clients_delete(request):
     """
