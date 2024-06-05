@@ -7,11 +7,13 @@ links = [
     {"label": "Medicamentos", "href": reverse("medicines_repo"), "icon": "bi bi-paw"},
     {"label": "Proveedores", "href": reverse("provider_repo"), "icon": "bi bi-person-fill"}, 
     {"label": "Productos", "href": reverse("products_repo"), "icon": "bi bi-shop"},
-    {"label": "Veterinarias", "href": reverse("vet_repo"), "icon": "bi bi-house-heart"},
+    {"label": "Veterinarios", "href": reverse("vet_repo"), "icon": "bi bi-house-heart"},
 ]
 
 
 def navbar(request):
+    """ Retorna Un diccionario que contiene los enlaces de la barra de navegación, cada uno con una propiedad 'active'
+        indicando si es el enlace activo en la página actual"""
     def add_active(link):
         copy = link.copy()
 

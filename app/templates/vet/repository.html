@@ -2,12 +2,12 @@
 
 {% block main %}
 <div class="container">
-    <h1 class="mb-4">Veterinaria</h1>
+    <h1 class="mb-4">Veterinario</h1>
 
     <div class="mb-2">
         <a href="{% url 'vet_form' %}" class="btn btn-primary">
             <i class="bi bi-plus"></i>
-            Nueva Veterinaria
+            Nuevo Veterinario
         </a>
     </div>
 
@@ -23,16 +23,15 @@
         </thead>
 
         <tbody>
-            {% for vet in vet %}
+            {% for vet in vets %}
             <tr>
-                    <td>{{vet.name}}</td>
-                    <td>{{vet.email}}</td>
-                    <td>{{vet.phone}}</td>
-                    <td>{{vet.speciality}}</td>
+                    <td>{{ vet.name }}</td>
+                    <td>{{ vet.email }}</td>
+                    <td>{{ vet.phone }}</td>
+                    <td>{{ vet.speciality }}</td>
                     <td>
                         <a class="btn btn-outline-primary"
-                           href="{% url 'vet_edit' id=vet.id %}"
-                        >Editar</a>
+                           href="{% url 'vet_edit' id=vet.id %}">Editar</a>
                         <form method="POST"
                             action="{% url 'vet_delete' %}"
                             aria-label="Formulario de eliminación de veterinaria">
@@ -46,7 +45,7 @@
             {% empty %}
                 <tr>
                     <td colspan="5" class="text-center">
-                        No existe veterinaria
+                        No existen veterinarios
                     </td>
                 </tr>
             {% endfor %}
