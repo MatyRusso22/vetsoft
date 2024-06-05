@@ -667,7 +667,7 @@ class VetSpecialityTestCase(PlaywrightTestCase):
             speciality = Vet.SPECIALITY_CHOICES.NEUROLOGIA,
         )
 
-        self.page.goto(f"{self.live_server_url}{reverse('vet_edit', kwargs={"id": vet.id})}")
+        self.page.goto(f"{self.live_server_url}{reverse('vet_edit', kwargs={'id': vet.id})}")
 
         self.page.get_by_label("Nombre").fill("messi")
         self.page.get_by_label("Teléfono").fill("1534998955")
