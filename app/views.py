@@ -12,11 +12,17 @@ from .models import Vet
 
 def home(request):
     """Renderiza la página de inicio."""
+    """
+    Renderiza la página de inicio.
+    """
     return render(request, "home.html")
 
 
 def clients_repository(request):
     """Retorna todos los clientes almacenados"""
+    """
+    Muestra el repositorio de clientes.
+    """
     clients = Client.objects.all()
     return render(request, "clients/repository.html", {"clients": clients})
 
