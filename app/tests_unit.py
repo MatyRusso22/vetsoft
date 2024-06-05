@@ -1,12 +1,17 @@
 from django.test import TestCase
-from app.models import Client, validate_medicine
-from app.models import Provider
-from app.models import Medicine
-from app.models import Product,validate_product
-from app.models import Pet 
 
+from app.models import (
+    Client,
+    Medicine,
+    Pet,
+    Product,
+    Provider,
+    Vet,
+    validate_medicine,
+    validate_product,
+    validate_Vet,
+)
 
-from app.models import Vet , EspecialidadVeterinario
 
 class ClientModelTest(TestCase):
     def test_can_create_and_get_client(self):
@@ -328,38 +333,79 @@ class PetModelTest(TestCase):
         self.assertIsNone(errors)
 
 
-class VetTestCase(TestCase):
-    def test_speciality_vet(self):
-        """
-        Prueba la creación de un veterinario con especialidad.
-        """
-        vet = Vet.objects.create(
-            name="Juan Sebastian Veron",
-            email="juan@example.com",
-            phone="1234567890",
-            speciality=EspecialidadVeterinario.CIRUGIA
-        )
-        self.assertEqual(vet.speciality, EspecialidadVeterinario.CIRUGIA)        
-
+class VetModelTest(TestCase):
     def test_can_create_and_get_vet(self):
         """
-        Prueba la creación de un veterinario y la obtención del mismo.
+        Valida la creacion de un veterinario y los datos
+        """
+        success, errors = Vet.save_vet(
+            {
+                "name": "Juan Perez",
+                "email": "juan@example.com",
+                "phone": "123456789",
+                "speciality": "Cardiologia",  # Usa la especialidad correcta
+            }
+        )
+        self.assertTrue(success)
+        self.assertIsNone(errors)
+
+        vets = Vet.objects.all()
+        self.assertEqual(len(vets), 1)
+
+        self.assertEqual(vets[0].name, "Juan Perez")
+        self.assertEqual(vets[0].email, "juan@example.com")
+        self.assertEqual(vets[0].phone, "123456789")
+        self.assertEqual(vets[0].speciality, "Cardiologia")
+
+    def test_validate_vet_speciality(self):
+        """
+        Valida el error a la creacion de un veterinario con una especialidad no valida
+        """
+        data = {
+            'name': 'Juan Perez',
+            'email': 'juan@example.com',
+            'phone': '123456789',
+            'speciality': 'oftalmologia'  # Una especialidad inválida
+        }
+        errors = validate_Vet(data)
+        self.assertIn('speciality', errors)
+        self.assertEqual(errors['speciality'], 'Especialidad no válida')
+
+    def test_validate_vet_empty_speciality(self):
+        """
+        Valida el error a la creacion de un veterinario con una especialidad vacia
+        """
+        data = {
+            'name': 'Juan Perez',
+            'email': 'juan@example.com',
+            'phone': '123456789',
+            'speciality': ''  # Una especialidad vacia
+        }
+        errors = validate_Vet(data)
+        self.assertIn('speciality', errors)
+        self.assertEqual(errors['speciality'], 'Por favor seleccione una especialidad válida')
+
+    def test_can_update_vet(self):
+        """
+        Prueba la actualización de un veterinario existente.
         """
         Vet.save_vet(
             {
-                "name": "Juan Sebastian Veron",
-                "email": "brujita75@hotmail.com",
-                "phone": "221555232",
-                "speciality": "EspecialidadVeterinario.CIRUGIA",
+                "name": "Juan Perez",
+                "email": "juan@example.com",
+                "phone": "123456789",
+                "speciality": "Cardiologia",  
             }
         )
-        vet = Vet.objects.all()
-        self.assertEqual(len(vet), 1)
-
-        self.assertEqual(vet[0].name, "Juan Sebastian Veron")
-        self.assertEqual(vet[0].email, "brujita75@hotmail.com")
-        self.assertEqual(vet[0].phone, "221555232")
-        self.assertEqual(vet[0].speciality, "EspecialidadVeterinario.CIRUGIA")
-        
+        vet = Vet.objects.get(pk=1)
+        self.assertEqual(vet.speciality, 'Cardiologia')
+        vet.update_vet( {
+                "name": "Juan Perez",
+                "email": "juan@example.com",
+                "phone": "123456789",
+                "speciality": "Clinica",  
+            } )
+        vet_updated = Vet.objects.get(pk=1)
+        self.assertEqual(vet_updated.speciality, 'Clinica')        
 
       
