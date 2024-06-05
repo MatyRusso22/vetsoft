@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-lg-6 offset-lg-3">
             <form class="vstack gap-3 {% if errors %}was-validated{% endif %}"
-                aria-label="Formulario de creacion de cliente"
+                aria-label="Formulario de creación de cliente"
                 method="POST"
                 action="{% url 'clients_form' %}"
                 novalidate>
@@ -25,8 +25,8 @@
                     <input type="text"
                         id="name"
                         name="name"
-                        value="{{client.name}}"
-                        class="form-control"
+                        value="{{ client.name }}"
+                        class="form-control {% if errors.name %}is-invalid{% endif %}"
                         required/>
 
                     {% if errors.name %}
@@ -58,17 +58,20 @@
                     <input type="email"
                         id="email"
                         name="email"
-                        class="form-control"
+                        class="form-control {% if errors.email %}is-invalid{% endif %}"
                         value="{{ client.email }}"
-                        required/>
-
+                        required
+                        pattern=".*@vetsoft\.com"
+                        title="El email debe terminar en @vetsoft.com"
+                        oninput="this.setCustomValidity('')"
+                        oninvalid="this.setCustomValidity('El email debe terminar en @vetsoft.com')"
+                    />
                     {% if errors.email %}
                         <div class="invalid-feedback">
                             {{ errors.email }}
                         </div>
                     {% endif %}
                 </div>
-                
                 <div>
                     <label for="city" class="form-label">Ciudad</label>
                     <select type="city"
@@ -95,4 +98,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const emailField = document.getElementById('email');
+        emailField.addEventListener('input', function(event) {
+            const value = event.target.value;
+            if (!value.endsWith('@vetsoft.com')) {
+                emailField.setCustomValidity('El email debe terminar en @vetsoft.com');
+            } else {
+                emailField.setCustomValidity('');
+            }
+        });
+    });
+</script>
 {% endblock %}
