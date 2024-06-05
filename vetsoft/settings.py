@@ -29,10 +29,10 @@ DEBUG = False
 
 SECRET_KEY = "django-insecure-p)^5i@33!)v)l7*c#q)%j(g5d+**-yo%)6l*vg!gs_w-e=^_ig"
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', '*', "vetsoft-app-1-0-0.onrender.com"]
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', '*', "https://vetsoft-qkop.onrender.com"]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://vetsoft-app-1-0-0.onrender.com',
+    'https://vetsoft-qkop.onrender.com',
 ]
 
 
