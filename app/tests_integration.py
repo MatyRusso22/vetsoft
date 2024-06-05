@@ -180,6 +180,32 @@ class ClientsTest(TestCase):
         editedClient = Client.objects.get(pk=client.id)
         self.assertEqual(editedClient.city, "La Plata")
 
+    def test_edit_user_with_invalid_data_test_email_not_end_vetsoft(self):
+        """"
+        Test para editar un cliente con datos validos y con email sin terminar en vetsoft
+        """
+        client = Client.objects.create(
+            name="Pepe",
+            city="La Plata",
+            phone="54114587536",
+            email="pep10@vetsoft.com",
+        )
+
+
+        self.client.post(
+            reverse("clients_form"),
+              data={
+                "id": client.id,
+                "name": "Pepe",
+                "phone": "54114587536",
+                "city": "La Plata",
+                "email": "pep10@gmail.com",
+            },
+        )
+
+        # redirect after post
+        editedClient = Client.objects.get(pk=client.id)
+        self.assertEqual(editedClient.email, "pep10@vetsoft.com")
 
 class ProvidersTest(TestCase):
 
