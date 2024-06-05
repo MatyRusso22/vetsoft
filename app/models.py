@@ -9,6 +9,7 @@ def validate_client(data):
     name = data.get("name", "")
     phone = data.get("phone", "")
     email = data.get("email", "")
+    city = data.get("city", "")
 
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
@@ -30,8 +31,20 @@ def validate_client(data):
     elif email.count("@") == 0:
         errors["email"] = "Por favor ingrese un email valido"
     
+    if city == "" or city is None:
+        errors["city"] = "Por favor ingrese una ciudad"
+    elif city not in dict(City.choices):
+        errors["city"] = "Ciudad no válida"
 
     return errors
+
+class City(models.TextChoices):
+    """
+    Ciudades de los clientes.
+    """
+    LA_PLATA = 'La Plata', _('La Plata')
+    BERISSO = 'Berisso', _('Berisso')
+    ENSENADA = 'Ensenada', _('Ensenada')
 
 def validate_medicine(data):
     """Valida que no se genere una medicina vacia en la veterinaria y  que la dosis este entre 1 y 10"""
@@ -144,7 +157,7 @@ class Client(models.Model):
     name = models.CharField(max_length=100)
     phone = models.IntegerField()
     email = models.EmailField()
-    address = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=50, choices=City, default=City.LA_PLATA)
 
     def __str__(self):
         """
@@ -176,7 +189,7 @@ class Client(models.Model):
             name=client_data.get("name"),
             phone=client_data.get("phone"),
             email=client_data.get("email"),
-            address=client_data.get("address"),
+            city=client_data.get("city"),
         )
 
         return True, None
@@ -191,13 +204,19 @@ class Client(models.Model):
         Returns:
             Ninguno.
         """
+        errors = validate_client(client_data)
+
+        if len(errors.keys()) > 0:
+            return False, errors
+
         self.name = client_data.get("name", "") or self.name
         self.email = client_data.get("email", "") or self.email
         self.phone = client_data.get("phone", "") or self.phone
-        self.address = client_data.get("address", "") or self.address
+        self.city = client_data.get("city", "") or self.city
 
         self.save()
-
+        return True, None
+    
 class Pet(models.Model):
     """
     Definicion de clase mascota y sus metodos
