@@ -57,7 +57,7 @@ class ClientsTest(TestCase):
                 "name": "Juan Sebastian Veron",
                 "phone": 54221555232,
                 "city": "La Plata",
-                "email": "brujita75@hotmail.com",
+                "email": "brujita75@vetsoft.com",
             },
         )
         clients = Client.objects.all()
@@ -66,7 +66,7 @@ class ClientsTest(TestCase):
         self.assertEqual(clients[0].name, "Juan Sebastian Veron")
         self.assertEqual(clients[0].phone, 54221555232)
         self.assertEqual(clients[0].city, "La Plata")
-        self.assertEqual(clients[0].email, "brujita75@hotmail.com")
+        self.assertEqual(clients[0].email, "brujita75@vetsoft.com")
 
         self.assertRedirects(response, reverse("clients_repo"))
 
@@ -114,7 +114,7 @@ class ClientsTest(TestCase):
             name="Juan Sebastián Veron",
             city="La Plata",
             phone=54221555232,
-            email="brujita75@hotmail.com",
+            email="brujita75@vetsoft.com",
         )
 
         response = self.client.post(
@@ -124,7 +124,7 @@ class ClientsTest(TestCase):
                 "name": "Guido Carrillo",
                 "city": "La Plata",
                 "phone": 54221555232,
-                "email": "brujita75@hotmail.com",
+                "email": "brujita75@vetsoft.com",
             },
         )
 
@@ -147,7 +147,7 @@ class ClientsTest(TestCase):
                 "name": "Juan Sebastian Veron",
                 "phone": "asdhashdh",
                 "city": "La Plata",
-                "email": "brujita75@hotmail.com",
+                "email": "brujita75@vetsoft.com",
             },
         )
 
@@ -161,7 +161,7 @@ class ClientsTest(TestCase):
             name="Pepe",
             city="La Plata",
             phone="54114587536",
-            email="pep10@gmail.com",
+            email="pep10@vetsoft.com",
         )
 
 
@@ -172,7 +172,7 @@ class ClientsTest(TestCase):
                 "name": "Pepe",
                 "phone": "54114587536",
                 "city": "Ciudad inexistente",
-                "email": "pep10@gmail.com",
+                "email": "pep10@vetsoft.com",
             },
         )
 

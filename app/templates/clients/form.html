@@ -66,31 +66,13 @@
                         oninput="this.setCustomValidity('')"
                         oninvalid="this.setCustomValidity('El email debe terminar en @vetsoft.com')"
                     />
-
                     {% if errors.email %}
                         <div class="invalid-feedback">
                             {{ errors.email }}
                         </div>
                     {% endif %}
                 </div>
-                
                 <div>
-                    <label for="address" class="form-label">Dirección</label>
-                    <input type="text"
-                        id="address"
-                        name="address"
-                        value="{{ client.address }}"
-                        class="form-control {% if errors.address %}is-invalid{% endif %}" />
-
-                    {% if errors.address %}
-                        <div class="invalid-feedback">
-                            {{ errors.address }}
-                        </div>
-                    {% else %}
-                        <div class="invalid-feedback">
-                            La dirección es opcional
-                        </div>
-                    {% endif %}
                     <label for="city" class="form-label">Ciudad</label>
                     <select type="city"
                         id="city"
