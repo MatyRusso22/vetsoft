@@ -12,6 +12,8 @@ links = [
 
 
 def navbar(request):
+    """ Retorna Un diccionario que contiene los enlaces de la barra de navegación, cada uno con una propiedad 'active'
+        indicando si es el enlace activo en la página actual"""
     def add_active(link):
         copy = link.copy()
 
