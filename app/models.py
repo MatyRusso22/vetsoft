@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+
 def validate_client(data):
     """Valida que no se genere un cliente vacio en la veterinaria"""
     errors = {}
@@ -12,6 +13,8 @@ def validate_client(data):
 
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
+    elif not all(char.isalpha() or char.isspace() for char in name):
+        errors["name"] = "El nombre solo puede contener letras y espacios"
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
@@ -178,6 +181,10 @@ class Client(models.Model):
         Returns:
             Ninguno.
         """
+        errors = validate_client(client_data)
+
+        if len(errors.keys()) > 0:
+            return False, errors
         self.name = client_data.get("name", "") or self.name
         self.email = client_data.get("email", "") or self.email
         self.phone = client_data.get("phone", "") or self.phone
