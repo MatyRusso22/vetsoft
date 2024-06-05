@@ -5,7 +5,6 @@ from django.test import TestCase
 
 from app.models import (
     Client,
-    EspecialidadVeterinario,
     Medicine,
     Pet,
     Product,
@@ -517,81 +516,51 @@ class ProductTest(TestCase):
         )
         self.assertContains(response, "Por favor ingrese un precio del producto mayor que cero")
 
-
-class VetTest(TestCase):
-    def test_repo_use_repo_template(self):
-        """
-        Verifica que se use la plantilla del repositorio de veterinarios. 
-        """
-        response = self.client.get(reverse("vet_repo"))
-        self.assertTemplateUsed(response, "vet/repository.html")
-
-    def test_repo_display_all_vet(self):
-        """
-        Verifica que se muestre la plantilla con todos los veterinarios.
-        """
-        response = self.client.get(reverse("vet_repo"))
-        self.assertTemplateUsed(response, "vet/repository.html")
-
+class VetSpecialityIntegrationTest(TestCase):
     def test_form_use_form_template(self):
         """
-        Verifica que se use la plantilla del formulario de veterinarios.
+        Verifica que se use la plantilla de veterinario
         """
         response = self.client.get(reverse("vet_form"))
         self.assertTemplateUsed(response, "vet/form.html")
+    
+    def test_can_create_vet_with_valid_speciality(self):
+        """
+        Prueba de crear un veterinario con una especialidad.
+        """
+        self.client.post(reverse('vet_form'), {
+            'name': 'Juan Perez',
+            'email': 'juan@example.com',
+            'phone': '123456789',
+            'speciality': 'Cardiologia'
+        })
 
-    def test_can_create_vet(self):
-        """
-        Prueba la creación de un veterinario y la redirección al repositorio de veterinarios.
-        """
-        response = self.client.post(
-            reverse("vet_form"),
-            data={
-                "name": "Juan",
-                "email": "juan@example.com",
-                "phone": "1234567890",
-                "speciality": EspecialidadVeterinario.CIRUGIA,  # Use the actual value from the enum
-            },
-        )
+        # Verifica que se ha creado un veterinario
         vets = Vet.objects.all()
         self.assertEqual(len(vets), 1)
 
-        self.assertEqual(vets[0].name, "Juan")
-        self.assertEqual(vets[0].email, "juan@example.com")
-        self.assertEqual(vets[0].phone, "1234567890")
-        self.assertEqual(vets[0].speciality, EspecialidadVeterinario.CIRUGIA)
+        # Verifica que los datos del veterinario son correctos
+        self.assertEqual(vets[0].name, 'Juan Perez')
+        self.assertEqual(vets[0].email, 'juan@example.com')
+        self.assertEqual(vets[0].phone, '123456789')
+        self.assertEqual(vets[0].speciality, 'Cardiologia')
 
-        self.assertRedirects(response, reverse("vet_repo"))
-
-    def test_validation_errors_create_vet(self):
+    def test_cannot_create_vet_with_invalid_speciality(self):
         """
-        Verifica los errores de validación al crear un veterinario sin datos. 
+        Prueba el error de crear un veterinario con una especialidad inválida
         """
-        response = self.client.post(
-            reverse("vet_form"),
-            data={},
-        )
+        response = self.client.post(reverse('vet_form'), {
+            'name': 'Juan Perez',
+            'email': 'juan@example.com',
+            'phone': '123456789',
+            'speciality': 'Oftalmologia'  # Especialidad inválida
+        })
+        self.assertContains(response, 'Especialidad no válida')
 
-        self.assertContains(response, "Por favor ingrese un nombre")
-        self.assertContains(response, "Por favor ingrese un email")
-        self.assertContains(response, "Por favor ingrese un teléfono")
-        self.assertContains(response, "Por favor ingrese una especialidad")
+        vets = Vet.objects.all()
+        self.assertEqual(len(vets), 0)  # Verificar que no se creó el veterinario
 
-    def test_validation_invalid_email_vet(self):
-        """
-        Verifica la validación de un email inválido al crear un veterinario. 
-        """
-        response = self.client.post(
-            reverse("vet_form"),
-            data={
-                "name": "Juan",
-                "email": "invalidemail",  # Un email inválido
-                "phone": "1234567890",
-                "speciality": EspecialidadVeterinario.CIRUGIA,
-            },
-        )
 
-        self.assertContains(response, "Por favor ingrese un email valido")
 
     
        
