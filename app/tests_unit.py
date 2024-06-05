@@ -77,6 +77,32 @@ class ClientModelTest(TestCase):
         client_updated = Client.objects.get(pk=1)
 
         self.assertEqual(client_updated.phone, "221555232")
+    
+    def test_validate_client_phone_invalid(self):
+        """
+        Verifica la validación de un telefono no numerico al guardar un cliente.
+        """
+        result, errors = Client.save_client({
+            "name": "Telefono invalido",
+            "phone": "letrasenvezdenumero",
+            "address": "7 y 50",
+            "email": "asdsadsad@gmail.com",
+        })
+        self.assertEqual(result, False)
+        self.assertDictEqual(errors, {'phone': 'Por favor ingrese un telefono valido'})
+
+    def test_validate_client_phone_valid(self):
+        """
+        Verifica la validación de un telefono de cliente válido.
+        """
+        data = {
+            'name': 'Juan Sebastian Veron',
+            'phone': '542213190689',
+            'address': '13 y 44',
+            'email': 'brujita75@hotmail.com',
+        }
+        errors = validate_product(data)
+        self.assertNotIn('client', errors)
 
 class ProviderModelTest(TestCase):
     def test_can_create_and_get_provider_with_address(self):

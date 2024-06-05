@@ -255,6 +255,17 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         expect(edit_action).to_have_attribute(
             "href", reverse("clients_edit", kwargs={"id": client.id})
         )
+    def test_shouldnt_be_able_to_create_client_with_no_numeric_phone(self):
+        """Prueba que no se pueda crear un cliente con un telefono no numerico"""
+        with self.assertRaises(ValueError):
+            client = Client.objects.create(
+                name="Juan Sebastián Veron",
+                address="13 y 44",
+                phone="nonumerico",
+                email="brujita75@hotmail.com",
+            )
+
+            self.assertEqual(Client.objects.count(), 0)
 
 class ProvidersTestCase(PlaywrightTestCase):
     def test_should_show_providers_data(self):
