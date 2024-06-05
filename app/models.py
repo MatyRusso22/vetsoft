@@ -17,9 +17,13 @@ def validate_client(data):
         errors["phone"] = "Por favor ingrese un teléfono"
     elif not phone.isdigit():
         errors["phone"] = "Por favor ingrese un telefono valido"
-
-    elif not str(phone).startswith("54"):
-            errors["phone"] = "El teléfono debe comenzar con 54"
+    else: 
+        try:
+            number = int(phone[:2])
+            if number != 54:
+                errors['phone'] = "El teléfono debe comenzar con 54" 
+        except ValueError:
+            errors["phone"] = "Por favor ingrese un telefono valido"
             
     if email == "":
         errors["email"] = "Por favor ingrese un email"
