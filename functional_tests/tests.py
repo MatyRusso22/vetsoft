@@ -266,6 +266,8 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
             )
 
             self.assertEqual(Client.objects.count(), 0)
+    
+ 
 
     def test_shouldnt_be_able_to_create_client_with_no_start_54_phone(self):
         """Prueba que no se pueda crear un cliente con un telefono que no empieza con 54"""
@@ -281,6 +283,21 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         self.page.get_by_role("button", name="Guardar").click() 
 
         expect(self.page.get_by_text("El teléfono debe comenzar con 54")).to_be_visible() 
+
+    def test_shouldnt_be_able_to_create_client_with_name_invalid(self):
+        """Prueba que no se pueda crear un cliente con un nombre invalido"""
+            
+        self.page.goto(f"{self.live_server_url}{reverse('clients_form')}") 
+
+        expect(self.page.get_by_role("form")).to_be_visible() 
+
+        self.page.get_by_label("Nombre").fill("1111111")
+        self.page.get_by_label("Teléfono").fill("54221555232")
+        self.page.get_by_label("Email").fill("brujita75@vetsoft.com")
+        self.page.get_by_label("Ciudad").select_option("La Plata")
+        self.page.get_by_role("button", name="Guardar").click() 
+
+        expect(self.page.get_by_text("El nombre solo puede contener letras y espacios")).to_be_visible()
 
     def test_shouldnt_be_able_to_create_client_with_city_invalid(self):
         """Prueba que no se pueda crear un cliente con una ciudad invalida"""
