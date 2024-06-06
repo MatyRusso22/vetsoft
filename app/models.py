@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-
 def validate_client(data):
     """Valida que no se genere un cliente vacio en la veterinaria"""
     errors = {}
