@@ -138,6 +138,41 @@ class ClientModelTest(TestCase):
         client_updated = Client.objects.get(pk=1)
 
         self.assertEqual(client_updated.city, "Ensenada")
+    
+    def test_update_client_with_error_name_invalid(self):
+        """
+        Verifica que no se pueda actualizar un cliente con nombre incorrectos.
+        """
+        Client.save_client(
+            {
+                "name": "Juan Sebastian Veron",
+                "phone": "54221555232",
+                "city": "Ensenada",
+                "email": "brujita75@vetsoft.com",
+            }
+        )
+        client = Client.objects.get(pk=1)
+
+        self.assertEqual(client.name, "Juan Sebastian Veron")
+
+        client.update_client({"name": "pablo123"})
+
+        client_updated = Client.objects.get(pk=1)
+
+        self.assertEqual(client_updated.name, "Juan Sebastian Veron")
+
+    def test_validate_client_name_invalid(self):
+        """
+        Verifica la validación de un nombre no numerico al guardar un cliente.
+        """
+        result, errors = Client.save_client({
+            "name": "pablo123",
+            "phone": "5411111",
+            "city": "La Plata",
+            "email": "asdsadsad@vetsoft.com",
+        })
+        self.assertEqual(result, False)
+        self.assertDictEqual(errors, {'name': 'El nombre solo puede contener letras y espacios'})
 
     def test_update_client_with_error_wrong_email_not_end_vetsoft(self):
         """"

@@ -13,6 +13,8 @@ def validate_client(data):
 
     if name == "":
         errors["name"] = "Por favor ingrese un nombre"
+    elif not all(char.isalpha() or char.isspace() for char in name):
+        errors["name"] = "El nombre solo puede contener letras y espacios"
 
     if phone == "":
         errors["phone"] = "Por favor ingrese un teléfono"
