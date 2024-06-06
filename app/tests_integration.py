@@ -57,7 +57,7 @@ class ClientsTest(TestCase):
                 "name": "Juan Sebastian Veron",
                 "phone": 54221555232,
                 "city": "La Plata",
-                "email": "brujita75@hotmail.com",
+                "email": "brujita75@vetsoft.com",
             },
         )
         clients = Client.objects.all()
@@ -66,7 +66,7 @@ class ClientsTest(TestCase):
         self.assertEqual(clients[0].name, "Juan Sebastian Veron")
         self.assertEqual(clients[0].phone, 54221555232)
         self.assertEqual(clients[0].city, "La Plata")
-        self.assertEqual(clients[0].email, "brujita75@hotmail.com")
+        self.assertEqual(clients[0].email, "brujita75@vetsoft.com")
 
         self.assertRedirects(response, reverse("clients_repo"))
 
@@ -104,7 +104,7 @@ class ClientsTest(TestCase):
             },
         )
 
-        self.assertContains(response, "Por favor ingrese un email valido")
+        self.assertContains(response, "Por favor ingrese un email válido")
     
     def test_validation_invalid_name(self):
         """
@@ -130,7 +130,7 @@ class ClientsTest(TestCase):
             name="Juan Sebastián Veron",
             city="La Plata",
             phone=54221555232,
-            email="brujita75@hotmail.com",
+            email="brujita75@vetsoft.com",
         )
 
         response = self.client.post(
@@ -140,7 +140,7 @@ class ClientsTest(TestCase):
                 "name": "Guido Carrillo",
                 "city": "La Plata",
                 "phone": 54221555232,
-                "email": "brujita75@hotmail.com",
+                "email": "brujita75@vetsoft.com",
             },
         )
 
@@ -163,7 +163,7 @@ class ClientsTest(TestCase):
                 "name": "Juan Sebastian Veron",
                 "phone": "asdhashdh",
                 "city": "La Plata",
-                "email": "brujita75@hotmail.com",
+                "email": "brujita75@vetsoft.com",
             },
         )
 
@@ -177,7 +177,7 @@ class ClientsTest(TestCase):
             name="Pepe",
             city="La Plata",
             phone="54114587536",
-            email="pep10@gmail.com",
+            email="pep10@vetsoft.com",
         )
 
 
@@ -188,7 +188,7 @@ class ClientsTest(TestCase):
                 "name": "Pepe",
                 "phone": "54114587536",
                 "city": "Ciudad inexistente",
-                "email": "pep10@gmail.com",
+                "email": "pep10@vetsoft.com",
             },
         )
 
@@ -196,6 +196,32 @@ class ClientsTest(TestCase):
         editedClient = Client.objects.get(pk=client.id)
         self.assertEqual(editedClient.city, "La Plata")
 
+    def test_edit_user_with_invalid_data_test_email_not_end_vetsoft(self):
+        """"
+        Test para editar un cliente con datos validos y con email sin terminar en vetsoft
+        """
+        client = Client.objects.create(
+            name="Pepe",
+            city="La Plata",
+            phone="54114587536",
+            email="pep10@vetsoft.com",
+        )
+
+
+        self.client.post(
+            reverse("clients_form"),
+              data={
+                "id": client.id,
+                "name": "Pepe",
+                "phone": "54114587536",
+                "city": "La Plata",
+                "email": "pep10@gmail.com",
+            },
+        )
+
+        # redirect after post
+        editedClient = Client.objects.get(pk=client.id)
+        self.assertEqual(editedClient.email, "pep10@vetsoft.com")
 
 class ProvidersTest(TestCase):
 

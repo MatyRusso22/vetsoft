@@ -31,8 +31,10 @@ def validate_client(data):
     if email == "":
         errors["email"] = "Por favor ingrese un email"
     elif email.count("@") == 0:
-        errors["email"] = "Por favor ingrese un email valido"
-    
+        errors["email"] = "Por favor ingrese un email válido"
+    elif not email.endswith("@vetsoft.com"):
+        errors["email"] = "El email debe terminar en @vetsoft.com"
+
     if city == "" or city is None:
         errors["city"] = "Por favor ingrese una ciudad"
     elif city not in dict(City.choices):
