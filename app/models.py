@@ -68,7 +68,7 @@ def validate_medicine(data):
         errors["dosis"] = "Por favor ingrese una dosis"
     else: 
         try:
-            dosis = float(dosis)
+            dosis = int(dosis)
             if dosis <= 0:
                 errors['dosis'] = "La dosis debe ser mayor a cero"
             elif dosis  < 1:
@@ -76,7 +76,7 @@ def validate_medicine(data):
             elif dosis > 10:
                 errors["dosis"] = "La dosis debe ser menor que 10"
         except ValueError:
-            errors["dosis"] = "La cantidad de dosis no es correcta"
+            errors["dosis"] = "La cantidad de dosis no es correcta,debe ser una cantidad entera"
     return errors
 
 def validate_provider(data):
@@ -311,7 +311,7 @@ class Medicine(models.Model):
     """
     name = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=100, blank=True)
-    dosis = models.FloatField()
+    dosis = models.IntegerField()
 
     def __str__(self):
         """
