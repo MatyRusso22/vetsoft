@@ -468,7 +468,7 @@ class MedicinesTestCase(PlaywrightTestCase):
 
         self.page.get_by_label("Nombre").fill("Paracetamol")
         self.page.get_by_label("Descripcion").fill("Dolor de cabeza")
-        self.page.get_by_label("Dosis").fill("-10.0")
+        self.page.get_by_label("Dosis").fill("-10")
 
         self.page.get_by_role("button", name="Guardar").click()
 
