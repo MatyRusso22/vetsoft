@@ -79,12 +79,11 @@
                         id="city"
                         name="city"
                         class="form-select"
-                        value="{{client.city}}"
                         required>
-                        <option value="" disabled selected>Seleccione una opción</option>
-                        {% for value, label in cities %}
-                        <option value="{{ value }}">{{ label }}</option>
-                        {% endfor %}
+                    <option value="" disabled {% if not client.city %}selected{% endif %}>Seleccione una opción</option>
+                         {% for value, label in cities %}
+                    <option value="{{ value }}" {% if client.city == value %}selected{% endif %}>{{ label }}</option>
+                         {% endfor %}
                     </select>
                 
                     {% if errors.city %}

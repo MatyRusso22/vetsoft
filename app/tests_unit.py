@@ -201,6 +201,33 @@ class ClientModelTest(TestCase):
 
         self.assertEqual(client_updated.email, "brujita75@vetsoft.com")
 
+    def test_save_client_maintains_city_on_error(self):
+        """
+        Verifica que el campo city mantiene su valor después de un error de validación al guardar.
+        """
+        result, errors = Client.save_client({
+            "phone": "54221555232",
+            "email": "brujita75@vetsoft.com",
+            "city": "La Plata",
+        })
+
+        self.assertFalse(result)
+        self.assertIn("Por favor ingrese un nombre", errors.get("name", ""))
+        self.assertEqual(result.city, "La Plata")
+
+    def test_save_client_maintains_city_on_error(self):
+        """
+        Verifica que el campo city mantiene su valor después de un error de validación al guardar.
+        """
+        input_data={"phone": "54221555232",
+            "email": "brujita75@vetsoft.com",
+            "city": "La Plata",}
+        result, errors = Client.save_client(input_data)
+
+        self.assertFalse(result)
+        self.assertIn("Por favor ingrese un nombre", errors.get("name", ""))
+        self.assertEqual(input_data["city"], "La Plata")
+
 class ProviderModelTest(TestCase):
     def test_can_create_and_get_provider_with_address(self):
         """
