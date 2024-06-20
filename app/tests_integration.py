@@ -223,6 +223,46 @@ class ClientsTest(TestCase):
         editedClient = Client.objects.get(pk=client.id)
         self.assertEqual(editedClient.email, "pep10@vetsoft.com")
 
+    def test_city_field_maintains_value_on_validation_error(self):
+        """
+        Verifica que el campo city mantiene su valor después de un error de validación.
+        """
+        response = self.client.post(
+            reverse("clients_form"),
+            data={
+                "phone": "54221555232",
+                "email": "brujita75@vetsoft.com",
+                "city": "La Plata",
+            },
+        )
+
+        self.assertContains(response, "Por favor ingrese un nombre")
+        self.assertContains(response, f'La Plata')
+
+    def test_edit_client_city_field_maintains_value_on_validation_error(self):
+        """
+        Verifica que al editar un cliente el campo city mantiene su valor después de un error de validación.
+        """
+        client = Client.objects.create(
+            name="Pepe",
+            city="La Plata",
+            phone="54114587536",
+            email="pep10@vetsoft.com",
+        )
+        
+        response = self.client.post(
+            reverse("clients_form"),
+            data={
+                "id": client.id,
+                "name": "",
+                "phone": "54221555232",
+                "email": "brujita75@vetsoft.com",
+                "city": "La Plata",
+            },
+        )
+        self.assertContains(response, "Por favor ingrese un nombre")
+        self.assertContains(response, f'La Plata')
+
 class ProvidersTest(TestCase):
 
     def test_can_create_provider_with_valid_address(self):
