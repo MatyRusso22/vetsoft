@@ -257,33 +257,17 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         )
 
 
-def test_shouldnt_be_able_to_create_client_with_no_numeric_phone(self):
-    """Prueba que no se pueda crear un cliente con un telefono no numerico"""
+    def test_shouldnt_be_able_to_create_client_with_no_numeric_phone(self):
+        """Prueba que no se pueda crear un cliente con un telefono no numerico"""
+        with self.assertRaises(ValueError):
+            client = Client.objects.create(
+                name="Juan Sebastián Veron",
+                city="La Plata",
+                phone="nonumerico",
+                email="brujita75@vetsoft.com",
+            )
 
-    self.page.goto(f"{self.live_server_url}{reverse('clients_form')}")
-
-    expect(self.page.get_by_role("form")).to_be_visible()
-
-    # Utilizamos JavaScript para establecer un valor no numérico en el campo de teléfono
-    self.page.evaluate('''() => {
-        document.querySelector("input[name=phone]").value = "nonumerico";
-    }''')
-
-    self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
-    self.page.get_by_label("Email").fill("brujita75@vetsoft.com")
-    self.page.get_by_label("Ciudad").select_option("La Plata")
-
-    self.page.get_by_role("button", name="Guardar").click()
-
-    try:
-        # Esperamos a que aparezca el mensaje de error usando Playwright's expect
-        expect(self.page).to_have_text("Por favor ingrese un teléfono válido")
-    except Error.TimeoutError:
-        # Si el mensaje de error no aparece, se lanzará un Error.TimeoutError
-        self.fail("El mensaje de error 'Por favor ingrese un teléfono válido' no se mostró")
-
-    # Verificamos que no se haya creado ningún cliente en la base de datos
-    self.assertEqual(Client.objects.count(), 0)
+            self.assertEqual(Client.objects.count(), 0)
 
 
     def test_shouldnt_be_able_to_create_client_with_no_start_54_phone(self):
