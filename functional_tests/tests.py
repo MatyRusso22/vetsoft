@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
-from playwright.sync_api import Browser, expect, sync_playwright
+from playwright.sync_api import Browser, expect, sync_playwright, Error
 
 from app.models import Client, Medicine, Pet, Product, Provider, Vet, City
 
@@ -254,19 +254,31 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         expect(edit_action).to_have_attribute(
             "href", reverse("clients_edit", kwargs={"id": client.id})
         )
-    def test_shouldnt_be_able_to_create_client_with_no_numeric_phone(self):
-        """Prueba que no se pueda crear un cliente con un telefono no numerico"""
-        with self.assertRaises(ValueError):
-            client = Client.objects.create(
-                name="Juan Sebastián Veron",
-                city="La Plata",
-                phone="nonumerico",
-                email="brujita75@vetsoft.com",
-            )
 
-            self.assertEqual(Client.objects.count(), 0)
-    
- 
+    def test_shouldnt_be_able_to_create_client_with_no_numeric_phone(self):
+        """Prueba que no se pueda crear un cliente con un teléfono no numérico"""
+
+        self.page.goto(f"{self.live_server_url}{reverse('clients_form')}")
+
+        form_visible = self.page.locator("form").is_visible()
+        assert form_visible, "El formulario no está visible"
+
+        # Utilizo JavaScript para establecer un valor no numérico en el campo de teléfono
+        self.page.evaluate('''() => {
+            document.querySelector("input[name=phone]").value = "nonumerico";
+        }''')
+
+        self.page.get_by_label("Nombre").fill("Sebastian Romero")
+        self.page.get_by_label("Email").fill("chirola22@vetsoft.com")
+        self.page.get_by_label("Ciudad").select_option("Berisso")
+        self.page.click("button.btn-primary")
+
+        # Verifico que aparezca el mensaje de error esperado
+        error_visible = self.page.locator(".invalid-feedback").is_visible()
+        assert error_visible, "El mensaje de error 'Por favor ingrese un teléfono válido' no se mostró"
+
+        # Verifico que no se haya creado ningún cliente en la base de datos
+        assert Client.objects.count() == 0, "Se creó un cliente en la base de datos cuando no debería haberlo"
 
     def test_shouldnt_be_able_to_create_client_with_no_start_54_phone(self):
         """Prueba que no se pueda crear un cliente con un telefono que no empieza con 54"""
