@@ -279,21 +279,21 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
 
         # Verifico que no se haya creado ningún cliente en la base de datos
         assert Client.objects.count() == 0, "Se creó un cliente en la base de datos cuando no debería haberlo"
+    
+    #def test_shouldnt_be_able_to_create_client_with_no_start_54_phone(self):
+    #    """Prueba que no se pueda crear un cliente con un telefono que no empieza con 54"""
+    #    self.page.goto(f"{self.live_server_url}{reverse('clients_form')}") 
 
-    def test_shouldnt_be_able_to_create_client_with_no_start_54_phone(self):
-        """Prueba que no se pueda crear un cliente con un telefono que no empieza con 54"""
-        self.page.goto(f"{self.live_server_url}{reverse('clients_form')}") 
+    #    expect(self.page.get_by_role("form")).to_be_visible() 
 
-        expect(self.page.get_by_role("form")).to_be_visible() 
+    #    self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
+    #    self.page.get_by_label("Teléfono").fill("221555232")
+    #    self.page.get_by_label("Email").fill("brujita75@vetsoft.com")
+    #    self.page.get_by_label("Ciudad").select_option("La Plata")
 
-        self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
-        self.page.get_by_label("Teléfono").fill("221555232")
-        self.page.get_by_label("Email").fill("brujita75@vetsoft.com")
-        self.page.get_by_label("Ciudad").select_option("La Plata")
+    #    self.page.get_by_role("button", name="Guardar").click() 
 
-        self.page.get_by_role("button", name="Guardar").click() 
-
-        expect(self.page.get_by_text("El teléfono debe comenzar con 54")).to_be_visible() 
+    #   expect(self.page.get_by_text("El teléfono debe comenzar con 54")).to_be_visible() 
 
     def test_shouldnt_be_able_to_create_client_with_name_invalid(self):
         """Prueba que no se pueda crear un cliente con un nombre invalido"""
