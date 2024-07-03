@@ -99,6 +99,77 @@ class ClientModelTest(TestCase):
         self.assertEqual(result, False)
         self.assertDictEqual(errors, {'phone': 'Por favor ingrese un telefono valido'})
 
+    def test_validate_client_phone_not_starting_with_54(self):
+        """
+        Verifica la validación de un teléfono que no comienza con 54.
+        """
+        result, errors = Client.save_client({
+            "name": "Telefono Invalido",
+            "phone": "1234567890",
+            "city": "La Plata",
+            "email": "test@vetsoft.com",
+        })
+        self.assertEqual(result, False)
+        self.assertDictEqual(errors, {'phone': 'El teléfono debe comenzar con 54'})
+
+    def test_validate_client_phone_starting_with_54(self):
+        """
+        Verifica la validación de un teléfono que comienza con 54.
+        """
+        result, errors = Client.save_client({
+            "name": "Telefono Valido",
+            "phone": "54221555232",
+            "city": "La Plata",
+            "email": "test@vetsoft.com",
+        })
+        self.assertEqual(result, True) 
+
+    def test_update_client_phone_not_starting_with_54(self):
+        """
+        Verifica que no se pueda actualizar un cliente con un teléfono que no comienza con 54.
+        """
+        Client.save_client({
+            "name": "Cliente Existente",
+            "phone": '54221555232',
+            "city": "La Plata",
+            "email": "test@vetsoft.com",
+        })
+        client = Client.objects.get(pk=1)
+
+        client.update_client({
+            
+            "name": "Cliente Existente",
+            "phone": '1234567890',
+            "city": "La Plata",
+            "email": "test@vetsoft.com",
+        })
+
+        client_updated = Client.objects.get(pk=1)
+        self.assertEqual(client_updated.phone, 54221555232)
+
+    def test_update_client_phone_starting_with_54(self):
+        """
+        Verifica que se pueda actualizar un cliente con un teléfono que comienza con 54.
+        """
+        Client.save_client({
+            "name": "Cliente Existente",
+            "phone": '54221555232',
+            "city": "La Plata",
+            "email": "test@vetsoft.com",
+        })
+        client = Client.objects.get(pk=1)
+
+        client.update_client({
+            "name": "Cliente Existente",
+            "phone": '54221555233',
+            "city": "La Plata",
+            "email": "test@vetsoft.com",
+        })
+
+        client_updated = Client.objects.get(pk=1)
+        self.assertEqual(client_updated.phone, 54221555233) 
+    
+
     def test_validate_client_phone_valid(self):
         """
         Verifica la validación de un telefono de cliente válido.

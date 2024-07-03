@@ -263,6 +263,91 @@ class ClientsTest(TestCase):
         self.assertContains(response, "Por favor ingrese un nombre")
         self.assertContains(response, f'La Plata')
 
+    def test_create_client_with_phone_starting_with_54(self):
+        """
+        Prueba la creación de un cliente con un teléfono que comienza con 54 y la redirección al repositorio de clientes.
+        """
+        response = self.client.post(
+            reverse("clients_form"),
+            data={
+                "name": "Juan Sebastian Veron",
+                "phone": "54221555232",
+                "city": "La Plata",
+                "email": "brujita75@vetsoft.com",
+            },
+        )
+        clients = Client.objects.all()
+        self.assertEqual(len(clients), 1)
+        self.assertEqual(clients[0].phone, 54221555232)
+        self.assertRedirects(response, reverse("clients_repo"))
+
+    def test_edit_client_with_phone_starting_with_54(self):
+        """
+        Prueba la actualización de un cliente con un teléfono que comienza con 54 y la redirección correcta.
+        """
+        client = Client.objects.create(
+            name="Juan Sebastian Veron",
+            phone="54221555232",
+            city="La Plata",
+            email="brujita75@vetsoft.com",
+        )
+
+        response = self.client.post(
+            reverse("clients_form"),
+            data={
+                "id": client.id,
+                "name": "Juan Sebastian Veron",
+                "phone": "54221555233",
+                "city": "La Plata",
+                "email": "brujita75@vetsoft.com",
+            },
+        )
+
+        edited_client = Client.objects.get(pk=client.id)
+        self.assertEqual(edited_client.phone, 54221555233)
+        self.assertRedirects(response, reverse("clients_repo"))
+
+    def test_validation_phone_not_starting_with_54(self):
+        """
+        Verifica la validación de un teléfono que no comienza con 54 al crear o actualizar un cliente.
+        """
+        response = self.client.post(
+            reverse("clients_form"),
+            data={
+                "name": "Juan Sebastian Veron",
+                "phone": "1234567890",
+                "city": "La Plata",
+                "email": "brujita75@vetsoft.com",
+            },
+        )
+        self.assertContains(response, "El teléfono debe comenzar con 54")
+ 
+    def test_edit_client_with_invalid_phone_not_starting_with_54(self):
+        """
+        Verifica que no se pueda actualizar un cliente con un teléfono que no comienza con 54.
+        """
+        client = Client.objects.create(
+            name="Juan Sebastian Veron",
+            phone="54221555232",
+            city="La Plata",
+            email="brujita75@vetsoft.com",
+        )
+
+        response = self.client.post(
+            reverse("clients_form"),
+            data={
+                "id": client.id,
+                "name": "Juan Sebastian Veron",
+                "phone": "1234567890",
+                "city": "La Plata",
+                "email": "brujita75@vetsoft.com",
+            },
+        )
+
+        edited_client = Client.objects.get(pk=client.id)
+        self.assertEqual(edited_client.phone, 54221555232)
+        self.assertContains(response, "El teléfono debe comenzar con 54")
+ 
 class ProvidersTest(TestCase):
 
     def test_can_create_provider_with_valid_address(self):

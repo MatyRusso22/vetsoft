@@ -41,18 +41,17 @@
                     <input type="number"
                         id="phone"
                         name="phone"
-                        class="form-control"
-                        value="{{client.phone}}"
-                        pattern="^54\d*$" 
-                        class="form-control"
-                        step="1" 
+                        class="form-control {% if errors.phone %}is-invalid{% endif %}" 
+                        oninput="validatePhone()" 
+                        oninvalid="this.setCustomValidity('El teléfono debe comenzar con 54')"
+                        value="{{client.phone}}"  
                         required/>
-
-                    {% if errors.phone %}
-                        <div class="invalid-feedback">
-                            {{ errors.phone }}
-                        </div>
-                    {% endif %}
+                     
+                        {% if errors.phone %}
+                            <div  class="invalid-feedback">
+                                {{ errors.phone }}
+                            </div>
+                        {% endif %}
                 </div>
                 <div>
                     <label for="email" class="form-label">Email</label>
@@ -93,7 +92,7 @@
                     {% endif %}
                 </div>
 
-                <button class="btn btn-primary">Guardar</button>
+                <button id="guardarBtn"  class="btn btn-primary">Guardar</button>
             </form>
         </div>
     </div>
@@ -110,6 +109,23 @@
                 emailField.setCustomValidity('');
             }
         });
+    });
+    function validatePhone() {
+        const phoneInput = document.getElementById('phone');
+        const phoneValue = phoneInput.value;
+        if (phoneValue != '' && !phoneValue.startsWith('54')) {
+            phoneInput.setCustomValidity('El teléfono debe comenzar con 54');
+            phoneInput.classList.add('is-invalid');
+        } else {
+            phoneInput.setCustomValidity('');
+            phoneInput.classList.remove('is-invalid');
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const phoneInput = document.getElementById('phone');
+        validatePhone();
+        phoneInput.addEventListener('input', validatePhone);
     });
 </script>
 {% endblock %}

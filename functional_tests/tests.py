@@ -280,20 +280,41 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         # Verifico que no se haya creado ningún cliente en la base de datos
         assert Client.objects.count() == 0, "Se creó un cliente en la base de datos cuando no debería haberlo"
     
-    #def test_shouldnt_be_able_to_create_client_with_no_start_54_phone(self):
-    #    """Prueba que no se pueda crear un cliente con un telefono que no empieza con 54"""
-    #    self.page.goto(f"{self.live_server_url}{reverse('clients_form')}") 
+    def test_shouldnt_be_able_to_create_client_with_no_start_54_phone(self):
+        """Prueba que no se pueda crear un cliente con un telefono que no empieza con 54"""
+        self.page.goto(f"{self.live_server_url}{reverse('clients_form')}") 
 
-    #    expect(self.page.get_by_role("form")).to_be_visible() 
+        expect(self.page.get_by_role("form")).to_be_visible() 
 
-    #    self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
-    #    self.page.get_by_label("Teléfono").fill("221555232")
-    #    self.page.get_by_label("Email").fill("brujita75@vetsoft.com")
-    #    self.page.get_by_label("Ciudad").select_option("La Plata")
+        self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
+        self.page.get_by_label("Teléfono").fill("221555232")
+        self.page.get_by_label("Email").fill("brujita75@vetsoft.com")
+        self.page.get_by_label("Ciudad").select_option("La Plata")
 
-    #    self.page.get_by_role("button", name="Guardar").click() 
+        self.page.get_by_role("button", name="Guardar").click() 
 
-    #   expect(self.page.get_by_text("El teléfono debe comenzar con 54")).to_be_visible() 
+        expect(self.page.get_by_text('El teléfono debe comenzar con 54')).to_be_visible() 
+
+    def test_should_be_able_to_edit_a_client_no_start_phone(self):
+        """Prueba que permite editar un cliente existente"""
+        client = Client.objects.create(
+            name="Juan Sebastián Veron",
+            city="La Plata",
+            phone=54221555232,
+            email="brujita75@vetsoft.com",
+        )
+
+        path = reverse("clients_edit", kwargs={"id": client.id})
+        self.page.goto(f"{self.live_server_url}{path}")
+
+        self.page.get_by_label("Nombre").fill("Guido Carrillo")
+        self.page.get_by_label("Teléfono").fill("221232555")
+        self.page.get_by_label("Email").fill("goleador@vetsoft.com")
+        self.page.get_by_label("Ciudad").select_option("Ensenada")
+
+        self.page.get_by_role("button", name="Guardar").click() 
+
+        expect(self.page.get_by_text('El teléfono debe comenzar con 54')).to_be_visible() 
 
     def test_shouldnt_be_able_to_create_client_with_name_invalid(self):
         """Prueba que no se pueda crear un cliente con un nombre invalido"""
