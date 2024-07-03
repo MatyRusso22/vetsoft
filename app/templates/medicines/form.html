@@ -19,7 +19,7 @@
                 {% csrf_token %}
 
                 {% if medicines.id %}
-                    <input type="hidden" value="{{ form.instance.id }}" name="id" />
+                    <input type="hidden" value="{{ medicines.id }}" name="id" />
                 {% endif %}
 
                 <div>
