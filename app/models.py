@@ -363,6 +363,7 @@ class Medicine(models.Model):
         self.name = medicine_data.get("name", "") or self.name
         self.descripcion = medicine_data.get("descripcion", "") or self.descripcion
         self.dosis = medicine_data.get("dosis", "") or self.dosis
+        
         self.save()
     
         return True, None
