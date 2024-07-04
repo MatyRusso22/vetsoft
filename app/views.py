@@ -56,40 +56,32 @@ def clients_delete(request):
     return redirect(reverse("clients_repo"))
 
 def pets_repository(request):
-    """
-    Muestra el repositorio de mascotas.
-    """
     pets = Pet.objects.all()
     return render(request, "pets/repository.html", {"pets": pets})
 
 def pets_form(request, id=None):
-    """
-    Maneja el formulario para crear o actualizar una mascota.
-    """
     errors = {}
     pet = None
-    saved = True
+    form_title = "Agregar Mascota"
+    form_action = "pets_form"
+
+    if id is not None:
+        pet = get_object_or_404(Pet, pk=id)
+        form_title = "Editar Mascota"
+        form_action = "pets_edit"
 
     if request.method == "POST":
-        pet_id = request.POST.get("id") if "id" in request.POST else None
-
-        if pet_id is None:
-            saved, errors = Pet.save_pet(request.POST)
-        else:
-            pet = get_object_or_404(Pet, pk=pet_id)
-            try:
-                pet.update_pet(request.POST)
-            except ValueError as e:
-                errors["weight"] = str(e)
-                saved = False
-        if saved:
+        form = PetForm(request.POST, instance=pet)
+        if form.is_valid():
+            form.save()
             return redirect(reverse("pets_repo"))
+        else:
+            errors = form.errors
     else:
-        if id is not None:
-            pet = get_object_or_404(Pet, pk=id)
-    form = PetForm(request.POST or None, instance=pet)
+        form = PetForm(instance=pet)
+
     return render(
-        request, "pets/form.html", {"errors": errors, "form": form, "form_title": "Agregar Mascota", "form_action": "pets_form"},
+        request, "pets/form.html", {"form": form, "form_title": form_title, "form_action": form_action, "errors": errors}
     )
 
 def pets_delete(request):
