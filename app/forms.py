@@ -3,8 +3,10 @@ from django import forms
 from .models import Medicine, Pet, Product, Provider, Vet
 
 
-
 class PetForm(forms.ModelForm):
+    """
+    Clase mascota del formulario
+    """
     class Meta:
         model = Pet
         fields = ['name', 'breed', 'weight', 'birthday']
@@ -26,6 +28,9 @@ class PetForm(forms.ModelForm):
         }
 
     def clean_weight(self):
+        """
+        Funcion para comprobar que la mascota tenga peso positivo
+        """
         weight = self.cleaned_data.get("weight")
         if weight is not None and weight <= 0:
             raise forms.ValidationError("El peso debe ser mayor que 0")
