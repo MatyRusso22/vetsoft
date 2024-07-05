@@ -3,6 +3,7 @@ from django import forms
 from .models import Medicine, Pet, Product, Provider, Vet
 
 
+
 class PetForm(forms.ModelForm):
     class Meta:
         model = Pet
@@ -29,6 +30,7 @@ class PetForm(forms.ModelForm):
         if weight is not None and weight <= 0:
             raise forms.ValidationError("El peso debe ser mayor que 0")
         return weight
+
 class MedicineForm(forms.ModelForm):
     """
     Clase medicamento del formulario
