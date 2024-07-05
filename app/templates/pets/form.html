@@ -10,69 +10,72 @@
 
     <div class="row">
         <div class="col-lg-6 offset-lg-3">
-            <form class="vstack gap-3 {% if errors %}was-validated{% endif %}"
-            aria-label="Formulario de  {{ form_title|lower }} "
-                method="POST"
-                action="{% if form_action %}{% url form_action %}{% else %}{% url 'pets_form' %}{% endif %}"
-                novalidate>
+            <form class="vstack gap-3 {% if form.errors %}was-validated{% endif %}"
+                  aria-label="Formulario de {{ form_title|lower }} "
+                  method="POST"
+                  action="{% if form_action == 'pets_edit' %}{% url form_action form.instance.id %}{% else %}{% url 'pets_form' %}{% endif %}"
+                  novalidate>
 
                 {% csrf_token %}
 
-                {% if instance.id %}
-                    <input type="hidden" value="{{ instance.id }}" name="id" />
-                {% endif %}
+                {{ form.non_field_errors }}
 
                 <div>
                     <label for="name" class="form-label">Nombre</label>
                     <input type="text"
-                        id="name"
-                        name="name"
-                        value="{{ instance.name }}"
-                        class="form-control"
-                        required/>
+                           id="name"
+                           name="name"
+                           value="{{ form.name.value|default_if_none:'' }}"
+                           class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                           required/>
 
-                    {% if errors.name %}
+                    {% if form.name.errors %}
                         <div class="invalid-feedback">
-                            {{ errors.name }}
+                            {{ form.name.errors.0 }}
                         </div>
                     {% endif %}
                 </div>
+
                 <div>
                     <label for="breed" class="form-label">Raza (opcional)</label>
                     <input type="text"
-                        id="breed"
-                        name="breed"
-                        class="form-control"
-                        value="{{ form.instance.breed }}"/>
-                    <div>
-                        <label for="weight" class="form-label">Peso</label>
-                        <input type="number"
-                            id="weight"
-                            name="weight"
-                            step="0.1"
-                            class="form-control {% if errors.weight %}is-invalid{% endif %}"
-                            value="{{ pet.weight }}"
-                            required/>
-                        {% if errors.weight %}
-                            <div class="invalid-feedback">
-                                {{ errors.weight }}
-                            </div>
-                        {% endif %}
-                    </div>
-                        <label for="birthday" class="form-label">Fecha de Nacimiento</label>
-                        <input type="date" 
-                            id="birthday"
-                            name="birthday"
-                            class="form-control"
-                            value="{{ instance.birthday|date:'Y-m-d' }}" 
-                            required/>
-                        
-                        {% if errors.birthday %}
-                            <div class="invalid-feedback">
-                                {{ errors.birthday }}
-                            </div>
-                        {% endif %}
-                    </div>
+                           id="breed"
+                           name="breed"
+                           class="form-control"
+                           value="{{ form.breed.value|default_if_none:'' }}"/>
+                </div>
+
+                <div>
+                    <label for="weight" class="form-label">Peso</label>
+                    <input type="number"
+                           id="weight"
+                           name="weight"
+                           step="0.1"
+                           class="form-control {% if form.weight.errors %}is-invalid{% endif %}"
+                           value="{{ form.weight.value|default_if_none:'' }}"
+                           required/>
+                    {% if form.weight.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.weight.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="birthday" class="form-label">Fecha de Nacimiento</label>
+                    <input type="date"
+                           id="birthday"
+                           name="birthday"
+                           class="form-control {% if form.birthday.errors %}is-invalid{% endif %}"
+                           value="{{ form.birthday.value|default_if_none:'' }}"
+                           required/>
+                    {% if form.birthday.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.birthday.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
                 <button class="btn btn-primary">Guardar</button>
             </form>
         </div>
