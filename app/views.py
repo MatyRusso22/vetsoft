@@ -56,10 +56,16 @@ def clients_delete(request):
     return redirect(reverse("clients_repo"))
 
 def pets_repository(request):
+    """
+    Muestra el repositorio de mascotas.
+    """
     pets = Pet.objects.all()
     return render(request, "pets/repository.html", {"pets": pets})
 
 def pets_form(request, id=None):
+    """
+    Maneja el formulario para crear o actualizar una mascota.
+    """
     errors = {}
     pet = None
     form_title = "Agregar Mascota"
@@ -81,7 +87,7 @@ def pets_form(request, id=None):
         form = PetForm(instance=pet)
 
     return render(
-        request, "pets/form.html", {"form": form, "form_title": form_title, "form_action": form_action, "errors": errors}
+        request, "pets/form.html", {"form": form, "form_title": form_title, "form_action": form_action, "errors": errors},
     )
 
 def pets_delete(request):
