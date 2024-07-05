@@ -4,16 +4,31 @@ from .models import Medicine, Pet, Product, Provider, Vet
 
 
 class PetForm(forms.ModelForm):
-    """
-    Clase mascota del formulario
-    """
     class Meta:
-        """
-        Define los metadatos del formulario
-        """
         model = Pet
         fields = ['name', 'breed', 'weight', 'birthday']
+        error_messages = {
+            'name': {
+                'required': 'Por favor ingrese un nombre',
+            },
+            'weight': {
+                'required': 'Por favor ingrese un peso',
+                'invalid': 'Por favor ingrese un peso válido',
+            },
+            'birthday': {
+                'required': 'Por favor ingrese una fecha',
+                'invalid': 'Por favor ingrese una fecha válida',
+            },
+        }
+        widgets = {
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
+        }
 
+    def clean_weight(self):
+        weight = self.cleaned_data.get("weight")
+        if weight is not None and weight <= 0:
+            raise forms.ValidationError("El peso debe ser mayor que 0")
+        return weight
 class MedicineForm(forms.ModelForm):
     """
     Clase medicamento del formulario
