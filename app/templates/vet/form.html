@@ -74,9 +74,9 @@
                         class="form-select"
                         value="{{vet.speciality}}"
                         required>
-                        <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="" disabled {% if not vet.speciality %}selected{% endif %}>Seleccione una opción</option>
                         {% for value, label in specialities %}
-                        <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if vet.speciality == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
                 
