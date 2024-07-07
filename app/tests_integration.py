@@ -208,7 +208,7 @@ class ClientsTest(TestCase):
         )
 
 
-        self.client.post(
+        response = self.client.post(
             reverse("clients_form"),
               data={
                 "id": client.id,
@@ -218,7 +218,7 @@ class ClientsTest(TestCase):
                 "email": "pep10@gmail.com",
             },
         )
-
+        self.assertContains(response, "El email debe terminar en @vetsoft.com")
         # redirect after post
         editedClient = Client.objects.get(pk=client.id)
         self.assertEqual(editedClient.email, "pep10@vetsoft.com")
