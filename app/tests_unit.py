@@ -261,13 +261,15 @@ class ClientModelTest(TestCase):
 
         self.assertEqual(client.email, "brujita75@vetsoft.com")
 
-        client.update_client({
+        success, errors = client.update_client({
                 "name": "Juan Sebastian Veron",
                 "phone": "54221555232",
                 "city": "Ensenada",
                 "email": "pep10@gmail.com",
             })
-
+        # Verificar que la respuesta contiene el mensaje de error
+        self.assertFalse(success)
+        self.assertIn("El email debe terminar en @vetsoft.com", errors['email'])
         client_updated = Client.objects.get(pk=1)
 
         self.assertEqual(client_updated.email, "brujita75@vetsoft.com")
