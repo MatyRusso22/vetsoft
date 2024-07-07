@@ -7,7 +7,7 @@ def validate_client(data):
     errors = {}
 
     name = data.get("name", "")
-    phone = data.get("phone", "")
+    phone = str(data.get("phone", ""))  
     email = data.get("email", "")
     city = data.get("city", "")
 
@@ -21,7 +21,7 @@ def validate_client(data):
     elif not phone.isdigit():
         errors["phone"] = "Por favor ingrese un telefono valido"
     elif not phone.startswith('54'):
-            errors["phone"] = "El teléfono debe comenzar con 54"
+        errors["phone"] = "El teléfono debe comenzar con 54"
             
     if email == "":
         errors["email"] = "Por favor ingrese un email"
@@ -42,10 +42,11 @@ def validate_client(data):
 class City(models.TextChoices):
     """
     Ciudades de los clientes.
-    """
-    LA_PLATA = 'La Plata', _('La Plata')
-    BERISSO = 'Berisso', _('Berisso')
-    ENSENADA = 'Ensenada', _('Ensenada')
+    """ 
+    ENSENADA = 'Ensenada', 'Ensenada'
+    LA_PLATA = 'La Plata', 'La Plata'
+    BERISSO = 'Berisso', 'Berisso'
+
 
 def validate_medicine(data):
     """Valida que no se genere una medicina vacia en la veterinaria y  que la dosis este entre 1 y 10"""

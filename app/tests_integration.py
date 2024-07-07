@@ -170,8 +170,8 @@ class ClientsTest(TestCase):
         self.assertContains(response, "Por favor ingrese un telefono valido")
 
     def test_edit_user_with_invalid_data_test_city(self):
-        """"
-        Test para editar un cliente con datos validos y chequeo de ciudad
+        """
+        Test para editar un cliente con datos válidos y chequeo de ciudad
         """
         client = Client.objects.create(
             name="Pepe",
@@ -180,10 +180,9 @@ class ClientsTest(TestCase):
             email="pep10@vetsoft.com",
         )
 
-
-        self.client.post(
+        response = self.client.post(
             reverse("clients_form"),
-              data={
+            data={
                 "id": client.id,
                 "name": "Pepe",
                 "phone": "54114587536",
@@ -192,9 +191,12 @@ class ClientsTest(TestCase):
             },
         )
 
-        # redirect after post
+
+        self.assertEqual(response.status_code, 200) 
+
         editedClient = Client.objects.get(pk=client.id)
         self.assertEqual(editedClient.city, "La Plata")
+        self.assertContains(response, "Ciudad no válida")
 
     def test_edit_user_with_invalid_data_test_email_not_end_vetsoft(self):
         """"
