@@ -1,5 +1,5 @@
 from django.test import TestCase
-
+from django.core.exceptions import ValidationError
 from app.models import (
     Client,
     Medicine,
@@ -184,31 +184,27 @@ class ClientModelTest(TestCase):
         self.assertNotIn('client', errors)
 
     def test_update_client_with_error_wrong_city(self):
-        """"
-       Crea un cliente y verifica si se puede actualizar con una ciudad incorrecta
         """
-        Client.save_client(
-            {
-                "name": "Juan Sebastian Veron",
-                "phone": "54221555232",
-                "city": "Ensenada",
-                "email": "brujita75@vetsoft.com",
-            },
+        Testear que la función de validación del modelo devuelva el error correspondiente
+        cuando la ciudad no es correcta según las opciones definidas en choices.
+        """
+        # Crear un cliente inicial con datos válidos
+        client = Client.objects.create(
+            name="Pepe",
+            city=City.LA_PLATA,  # Acceder correctamente a las opciones de City
+            phone="54114587536",
+            email="pep10@vetsoft.com",
         )
-        client = Client.objects.get(pk=1)
 
-        self.assertEqual(client.city, "Ensenada")
+        # Intentar actualizar el cliente con una ciudad no válida
+        client.city = "Ciudad inexistente"
 
-        client.update_client({
-                "name": "Pepe",
-                "phone": "54113257398",
-                "city": "Error",
-                "email": "pep10@vetsoft.com",
-            })
+        # Llamar a full_clean para activar la validación del modelo
+        with self.assertRaises(ValidationError) as cm:
+            client.full_clean()
 
-        client_updated = Client.objects.get(pk=1)
-
-        self.assertEqual(client_updated.city, "Ensenada")
+        # Verificar el mensaje de error esperado
+        self.assertEqual(cm.exception.message_dict["city"], ["Value 'Ciudad inexistente' is not a valid choice."])
     
     def test_update_client_with_error_name_invalid(self):
         """
